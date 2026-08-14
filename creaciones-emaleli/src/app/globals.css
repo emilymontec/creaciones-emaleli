@@ -1,0 +1,221 @@
+@import "tailwindcss";
+
+/*
+ * Tipografía de marca: Heroik (display) y Qlassik (cuerpo/UI).
+ * Son fuentes propietarias de Creaciones Emaleli: no están en Google Fonts.
+ * Coloca los archivos (.woff2) en /public/fonts/ con estos nombres exactos
+ * (o ajusta las rutas) para que se apliquen; mientras tanto el navegador
+ * usa el fallback definido en --font-display / --font-sans sin romper nada.
+ */
+@font-face {
+  font-family: "Heroik";
+  src: url("/fonts/Heroik-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Heroik";
+  src: url("/fonts/Heroik-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qlassik";
+  src: url("/fonts/Qlassik-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qlassik";
+  src: url("/fonts/Qlassik-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qlassik";
+  src: url("/fonts/Qlassik-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-white: #ffffff;
+  --color-surface: #ffffff;
+  --color-bg-main: #f5f6fa;
+
+  /* Primario — lavanda de marca (logo, botones principales) */
+  --color-primary-50: #f4f3fa;
+  --color-primary-100: #e8e7f4;
+  --color-primary-200: #d3d1ea;
+  --color-primary-300: #b6b3db;
+  --color-primary-400: #a19ecb;
+  --color-primary-500: #9491bc;
+  --color-primary-600: #7a76a5;
+  --color-primary-700: #635f89;
+  --color-primary-800: #504d6f;
+  --color-primary-900: #434156;
+
+  /* Secundario — turquesa de marca */
+  --color-secondary-50: #eef8f9;
+  --color-secondary-100: #d7eef1;
+  --color-secondary-200: #b4e2e7;
+  --color-secondary-300: #a2d3d9;
+  --color-secondary-400: #7bbbc4;
+  --color-secondary-500: #5c9da6;
+  --color-secondary-600: #47828a;
+  --color-secondary-700: #3a6a70;
+  --color-secondary-800: #33575c;
+  --color-secondary-900: #2d494d;
+
+  /* Acento — rosa/magenta de marca (CTA, personalización, ofertas) */
+  --color-accent-50: #fdeaf0;
+  --color-accent-100: #fbd2e0;
+  --color-accent-200: #f6a9c4;
+  --color-accent-300: #ee80a8;
+  --color-accent-400: #e6738f;
+  --color-accent-500: #e06790;
+  --color-accent-600: #c34a74;
+  --color-accent-700: #9e3a5d;
+  --color-accent-800: #83324e;
+  --color-accent-900: #6f2c43;
+
+  /* Coral — segundo acento de marca (badges "HOT", destacados) */
+  --color-coral-50: #fff1f0;
+  --color-coral-100: #ffdedb;
+  --color-coral-200: #ffb8b2;
+  --color-coral-300: #ff958c;
+  --color-coral-400: #fe867b;
+  --color-coral-500: #fe7771;
+  --color-coral-600: #e4564f;
+  --color-coral-700: #bd413b;
+  --color-coral-800: #973733;
+  --color-coral-900: #7c322f;
+
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-error: #dc2626;
+  --color-error-light: #fee2e2;
+  --color-info: #0ea5e9;
+  --color-info-light: #e0f2fe;
+
+  --color-gray-50: #f8f8f9;
+  --color-gray-100: #f1f1f4;
+  --color-gray-200: #e4e4ea;
+  --color-gray-300: #d1d1da;
+  --color-gray-400: #a6a6b4;
+  --color-gray-500: #858591;
+  --color-gray-600: #696975;
+  --color-gray-700: #55555f;
+  --color-gray-800: #3b3b43;
+  --color-gray-900: #24242a;
+
+  --font-sans:
+    "Qlassik", var(--font-bridge), "Segoe UI", ui-sans-serif, system-ui,
+    -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-display:
+    "Heroik", var(--font-bridge), ui-sans-serif, system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --text-display-sm: 1.875rem;
+  --text-display-sm--line-height: 2.25rem;
+  --text-display-md: 2.25rem;
+  --text-display-md--line-height: 2.5rem;
+  --text-display-lg: 3rem;
+  --text-display-lg--line-height: 3.25rem;
+  --text-display-xl: 3.75rem;
+  --text-display-xl--line-height: 4rem;
+
+  --spacing-0-5: 0.125rem;
+  --spacing-section: 6rem;
+  --spacing-gutter: 1.5rem;
+
+  --radius-input: 0.625rem;
+  --radius-button: 0.625rem;
+  --radius-card: 0.875rem;
+  --radius-modal: 1.25rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 4px 12px rgb(148 145 188 / 0.08);
+  --shadow-card-hover: 0 8px 24px rgb(148 145 188 / 0.14);
+  --shadow-elevated: 0 10px 24px rgb(148 145 188 / 0.16);
+  --shadow-modal: 0 20px 40px rgb(34 37 49 / 0.18);
+
+  --max-width-page: 80rem;
+  --max-width-content: 72rem;
+
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-main);
+    color: var(--color-gray-900);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Animaciones y micro-interacciones estilo Temu/Shein */
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(254, 119, 113, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px 4px rgba(224, 103, 144, 0.5);
+  }
+}
+
+@keyframes badgeBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes flashMarquee {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.animate-badge-bounce {
+  animation: badgeBounce 1.5s infinite ease-in-out;
+}
+
+.bg-marquee-gradient {
+  background: linear-gradient(90deg, #fe7771, #e06790, #9491bc, #5c9da6, #fe7771);
+  background-size: 300% 300%;
+  animation: flashMarquee 8s ease infinite;
+}
+
