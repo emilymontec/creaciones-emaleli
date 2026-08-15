@@ -11,10 +11,10 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   neutral: "bg-gray-100 text-gray-700",
   primary: "bg-primary-50 text-primary-700",
-  success: "bg-success-light text-green-800",
-  warning: "bg-warning-light text-amber-800",
-  error: "bg-error-light text-red-800",
-  info: "bg-info-light text-sky-800",
+  success: "bg-success-light text-gray-800",
+  warning: "bg-warning-light text-gray-800",
+  error: "bg-error-light text-gray-800",
+  info: "bg-info-light text-gray-800",
 };
 
 export function Badge({

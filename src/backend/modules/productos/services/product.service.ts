@@ -111,8 +111,8 @@ export async function setProductEstado(
   return repository.setEstado(id, estado);
 }
 
-export async function getProducts() {
-  return repository.findAll();
+export async function getProducts(params: repository.FindAllProductosParams = {}) {
+  return repository.findAll(params);
 }
 
 export async function getProductById(id: string) {

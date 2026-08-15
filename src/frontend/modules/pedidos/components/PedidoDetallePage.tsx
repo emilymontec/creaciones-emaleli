@@ -43,10 +43,7 @@ import {
   type ActionState,
 } from "@/src/backend/modules/pedidos/actions/managePedidos";
 import { useToast } from "@/src/frontend/providers/ToastProvider";
-import type {
-  EstadoPedido,
-  TipoEventoTimeline,
-} from "@/generated/prisma/client";
+import type { EstadoPedido, TipoEventoTimeline } from "@/generated/prisma/client";
 import { ProduccionSection } from "./ProduccionSection";
 
 const TIPO_ICON: Record<string, any> = {
@@ -110,7 +107,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     return () => {
       cancelled = true;
     };
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pedidoId]);
 
   useEffect(() => {
@@ -133,10 +130,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
 
   useEffect(() => {
     if (comentState.success) {
-      toast({
-        title: comentState.message ?? "Comentario agregado",
-        variant: "success",
-      });
+      toast({ title: comentState.message ?? "Comentario agregado", variant: "success" });
       setComentario("");
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
@@ -154,42 +148,28 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
 
   useEffect(() => {
     if (pagoState.success) {
-      toast({
-        title: pagoState.message ?? "Pago registrado",
-        variant: "success",
-      });
+      toast({ title: pagoState.message ?? "Pago registrado", variant: "success" });
       setPagoModalOpen(false);
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
         setDetalle(res);
       });
     } else if (pagoState.error) {
-      toast({
-        title: "Error en pago",
-        description: pagoState.error,
-        variant: "error",
-      });
+      toast({ title: "Error en pago", description: pagoState.error, variant: "error" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagoState]);
 
   useEffect(() => {
     if (envioState.success) {
-      toast({
-        title: envioState.message ?? "Guía de envío guardada",
-        variant: "success",
-      });
+      toast({ title: envioState.message ?? "Guía de envío guardada", variant: "success" });
       setEnvioModalOpen(false);
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
         setDetalle(res);
       });
     } else if (envioState.error) {
-      toast({
-        title: "Error en guía de envío",
-        description: envioState.error,
-        variant: "error",
-      });
+      toast({ title: "Error en guía de envío", description: envioState.error, variant: "error" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envioState]);
@@ -267,8 +247,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             </Badge>
           </div>
           <p className="mt-1 text-sm text-gray-500">
-            {totalItems} {totalItems === 1 ? "producto" : "productos"} · Método
-            de envío: {p.metodoEnvio}
+            {totalItems} {totalItems === 1 ? "producto" : "productos"} · Método de
+            envío: {p.metodoEnvio}
           </p>
         </div>
 
@@ -373,7 +353,9 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                   Productos del pedido
                 </div>
               }
-              action={<Badge variant="neutral">{totalItems} unidades</Badge>}
+              action={
+                <Badge variant="neutral">{totalItems} unidades</Badge>
+              }
             />
             <div className="overflow-hidden rounded-input border border-gray-100">
               <table className="w-full text-sm">
@@ -555,8 +537,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                         {a.nombre || "Archivo adjunto"}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {a.tipo} ·{" "}
-                        {a.origen === "CLIENTE" ? "Cliente" : "Producción"}
+                        {a.tipo} · {a.origen === "CLIENTE" ? "Cliente" : "Producción"}
                       </p>
                     </div>
                   </a>
@@ -576,11 +557,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 </div>
               }
               action={
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setEnvioModalOpen(true)}
-                >
+                <Button size="sm" variant="secondary" onClick={() => setEnvioModalOpen(true)}>
                   Gestionar Guía
                 </Button>
               }
@@ -713,7 +690,9 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                           {TIPO_EVENTO_LABEL[ev.tipo] ?? ev.tipo}
                         </p>
                         {ev.estadoNuevo && (
-                          <EstadoPedidoBadge estado={ev.estadoNuevo} />
+                          <EstadoPedidoBadge
+                            estado={ev.estadoNuevo}
+                          />
                         )}
                       </div>
                       {ev.descripcion && (
@@ -757,11 +736,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             name="monto"
             label="Monto ($ COP)"
             type="number"
-            defaultValue={
-              Number(p.saldoPendiente) > 0
-                ? Number(p.saldoPendiente)
-                : undefined
-            }
+            defaultValue={Number(p.saldoPendiente) > 0 ? Number(p.saldoPendiente) : undefined}
             placeholder="0"
             required
           />
@@ -770,23 +745,13 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             label="Método de pago"
             defaultValue="Transferencia Bancaria"
             options={[
-              {
-                value: "Transferencia Bancaria",
-                label: "Transferencia (Bancolombia / Nequi / Daviplata)",
-              },
+              { value: "Transferencia Bancaria", label: "Transferencia (Bancolombia / Nequi / Daviplata)" },
               { value: "Efectivo", label: "Efectivo" },
-              {
-                value: "Tarjeta Débito/Crédito",
-                label: "Tarjeta Débito / Crédito",
-              },
+              { value: "Tarjeta Débito/Crédito", label: "Tarjeta Débito / Crédito" },
             ]}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setPagoModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" onClick={() => setPagoModalOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" loading={pagoPending}>
@@ -830,11 +795,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             placeholder="https://transportadora.com/rastreo?guia=..."
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setEnvioModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" onClick={() => setEnvioModalOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" loading={envioPending}>
@@ -848,3 +809,4 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     </div>
   );
 }
+

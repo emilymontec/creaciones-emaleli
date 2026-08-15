@@ -1,5 +1,5 @@
 export const STORAGE_BUCKETS = {
-  PRODUCTOS: "productos",
+  PRODUCTOS: process.env.SUPABASE_BUCKET_PRODUCTOS || "productos",
   PEDIDOS_ARCHIVOS: "pedidos-archivos",
   PEDIDOS_COMPROBANTES: "pedidos-comprobantes",
   PRODUCCION_AVANCES: "produccion-avances",

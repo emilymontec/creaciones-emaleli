@@ -11,6 +11,7 @@ Documento de la Fase 1 (1.4). Define cada variable, su propósito y cómo se con
 | `NEXT_PUBLIC_SUPABASE_URL`      | URL del proyecto Supabase (REST + Storage).                                                      | Cliente y servidor                             | Sí                  |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima de Supabase para peticiones del navegador (RLS).                                   | Cliente                                        | Sí                  |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Clave de servicio (bypass RLS). Solo server-side.                                                | Server (`src/shared/lib/supabase.ts`, scripts) | **No**              |
+| `SUPABASE_BUCKET_PRODUCTOS`     | Nombre del bucket de Storage para fotos de productos/categorías (galería, principal, variante). Por defecto `productos`. | Server (`src/shared/constants/storage.ts`, `pnpm storage:setup`) | No aplica (server)  |
 | `NEXT_PUBLIC_APP_NAME`          | Nombre público de la marca.                                                                      | Cliente/servidor (metadata, UI)                | Sí                  |
 | `NEXT_PUBLIC_APP_URL`           | URL base de la aplicación (metadata, enlaces `wa.me`).                                           | Server                                         | Sí                  |
 | `AUTH_SECRET`                   | Secreto para firmar los JWT de sesión (login admin). Generar con 48 bytes aleatorios.            | Server (`src/features/auth`, `src/proxy.ts`)   | **No**              |

@@ -65,10 +65,7 @@ export async function subirAvanceProduccionAction(
     });
     return {
       success: true,
-      message:
-        data.tipo === "VIDEO"
-          ? "Video de avance cargado."
-          : "Foto de avance cargada.",
+      message: data.tipo === "VIDEO" ? "Video de avance cargado." : "Foto de avance cargada.",
       data,
     };
   } catch (e) {
@@ -101,9 +98,7 @@ export async function toggleVisibilidadAvanceAction(
     await cambiarVisibilidadAvance(avanceId, pedidoId, visibleCliente);
     return {
       success: true,
-      message: visibleCliente
-        ? "Visible para el cliente."
-        : "Oculto del cliente.",
+      message: visibleCliente ? "Visible para el cliente." : "Oculto del cliente.",
     };
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
@@ -156,10 +151,7 @@ export async function obtenerProduccionCompletaAction(pedidoId: string) {
       obtenerComentariosProduccion(pedidoId),
       obtenerSolicitudesCambio(pedidoId),
     ]);
-    return {
-      success: true,
-      data: { avances, comentarios, solicitudes },
-    } as const;
+    return { success: true, data: { avances, comentarios, solicitudes } } as const;
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
     return { success: false, error: toErrorMessage(e) };
@@ -173,9 +165,7 @@ export async function crearSolicitudCambioAction(
   const user = await requireUser();
   const pedidoId = String(formData.get("pedidoId") ?? "");
   const descripcion = String(formData.get("descripcion") ?? "");
-  const origen = String(
-    formData.get("origen") ?? "ADMIN",
-  ) as OrigenSolicitudCambio;
+  const origen = String(formData.get("origen") ?? "ADMIN") as OrigenSolicitudCambio;
   const comentarioInicial = String(formData.get("comentarioInicial") ?? "");
 
   if (!pedidoId) return { success: false, error: "Pedido inválido." };
@@ -209,8 +199,7 @@ export async function responderSolicitudCambioAction(
   await requireUser();
   const id = String(formData.get("solicitudId") ?? "");
   const respuesta = String(formData.get("respuesta") ?? "");
-  const estado =
-    (formData.get("estado") as EstadoSolicitudCambio | null) ?? undefined;
+  const estado = (formData.get("estado") as EstadoSolicitudCambio | null) ?? undefined;
 
   if (!id) return { success: false, error: "Solicitud inválida." };
   if (!respuesta.trim()) {
@@ -259,9 +248,7 @@ export async function agregarComentarioSolicitudAction(
   const user = await requireUser();
   const solicitudId = String(formData.get("solicitudId") ?? "");
   const contenido = String(formData.get("contenido") ?? "");
-  const origen = String(
-    formData.get("origen") ?? "ADMIN",
-  ) as OrigenSolicitudCambio;
+  const origen = String(formData.get("origen") ?? "ADMIN") as OrigenSolicitudCambio;
   const visibleCliente = formData.get("visibleCliente") === "on";
 
   if (!solicitudId) return { success: false, error: "Solicitud inválida." };

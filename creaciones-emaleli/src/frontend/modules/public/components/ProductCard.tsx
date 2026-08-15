@@ -78,8 +78,8 @@ export function ProductCard({ producto }: { producto: ProductCardDTO }) {
               </span>
             )}
             {producto.tiempoProduccion && producto.tiempoProduccion <= 2 && (
-              <span className="inline-flex items-center gap-0.5 rounded-pill bg-amber-400 px-1.5 py-0.5 text-[9px] font-extrabold text-gray-900 shadow-xs">
-                <Flame className="size-2.5 text-coral-600 fill-coral-600" />
+              <span className="inline-flex items-center gap-0.5 rounded-pill bg-warning px-1.5 py-0.5 text-[9px] font-extrabold text-gray-900 shadow-card">
+                <Flame className="size-2.5 text-coral-600" />
                 Entrega rápida
               </span>
             )}

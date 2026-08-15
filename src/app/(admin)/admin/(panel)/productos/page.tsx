@@ -5,18 +5,26 @@ import { ProductsTable } from "@/src/frontend/modules/productos/components/Produ
 import { getProducts } from "@/src/backend/modules/productos/services/product.service";
 import { getCategories } from "@/src/backend/modules/categorias/services/category.service";
 
-type ProductoConCategorias = Awaited<ReturnType<typeof getProducts>>[number];
+type ProductosResult = Awaited<ReturnType<typeof getProducts>>;
+type ProductoConCategorias = ProductosResult["items"][number];
 type Categoria = Awaited<ReturnType<typeof getCategories>>[number];
 
-export default async function ProductosPage() {
-  const [productosRaw, categorias] = await Promise.all([
-    getProducts(),
+export default async function ProductosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Number(pageParam) > 0 ? Number(pageParam) : 1;
+
+  const [productosResult, categorias] = await Promise.all([
+    getProducts({ page }),
     getCategories(),
   ]);
 
   // Prisma.Decimal no es serializable de servidor -> cliente: se convierte
   // a number antes de pasarlo al componente cliente de la tabla.
-  const productos = productosRaw.map((p: ProductoConCategorias) => ({
+  const productos = productosResult.items.map((p: ProductoConCategorias) => ({
     ...p,
     precioBase: Number(p.precioBase),
     precioDescuento: p.precioDescuento ? Number(p.precioDescuento) : null,
@@ -36,7 +44,15 @@ export default async function ProductosPage() {
       />
 
       <Card className="p-0">
-        <ProductsTable productos={productos} categoriaOptions={categoriaOptions} />
+        <ProductsTable
+          productos={productos}
+          categoriaOptions={categoriaOptions}
+          pagination={{
+            page: productosResult.page,
+            totalPages: productosResult.pages,
+            total: productosResult.total,
+          }}
+        />
       </Card>
     </div>
   );

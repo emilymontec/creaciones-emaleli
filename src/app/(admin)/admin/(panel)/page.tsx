@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ClipboardList, Package, Tag, Wallet } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { obtenerDashboardMetricas } from "@/src/backend/modules/dashboard/actions/getDashboard";
@@ -50,7 +51,7 @@ export default async function DashboardPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {METRICS.map((metric) => (
-          <a
+          <Link
             key={metric.label}
             href={metric.href}
             className="transition-transform hover:-translate-y-0.5"
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
                 </p>
               </div>
             </Card>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

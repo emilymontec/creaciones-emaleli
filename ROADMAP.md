@@ -367,21 +367,21 @@
 
 ### 8.1 Actualizaciones de producción
 
-- [ ] Subida de fotos de avance
-- [ ] Subida de videos de avance
-- [ ] Comentarios internos y comentarios visibles al cliente
+- [x] Subida de fotos de avance
+- [x] Subida de videos de avance
+- [x] Comentarios internos y comentarios visibles al cliente
 
 ### 8.2 Solicitudes de cambio
 
-- [ ] Crear solicitud de cambio (desde admin o generada por el cliente)
-- [ ] Registrar respuesta del cliente (aprueba/rechaza/comenta)
-- [ ] Cierre de la solicitud con estado final
+- [x] Crear solicitud de cambio (desde admin o generada por el cliente)
+- [x] Registrar respuesta del cliente (aprueba/rechaza/comenta) — el admin la registra en el detalle del pedido (canal actual: WhatsApp/llamada), no hay login de cliente
+- [x] Cierre de la solicitud con estado final
 
 ### 8.3 Seguimiento
 
-- [ ] Vista pública de seguimiento por enlace único (token no adivinable)
-- [ ] Mostrar estado actual, timeline resumido y actualizaciones de producción
-- [ ] Sin necesidad de autenticación para el cliente
+- [x] Vista pública de seguimiento por enlace único (token no adivinable)
+- [x] Mostrar estado actual, timeline resumido y actualizaciones de producción
+- [x] Sin necesidad de autenticación para el cliente
 
 **Entregable de la fase:** proceso de producción documentado y visible, mejorando la comunicación con el cliente sin canales adicionales.
 

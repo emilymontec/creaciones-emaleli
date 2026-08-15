@@ -23,7 +23,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   ghost:
     "bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:outline-gray-300",
   destructive:
-    "bg-error text-white hover:bg-red-700 focus-visible:outline-error",
+    "bg-error text-white hover:bg-error/90 focus-visible:outline-error",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

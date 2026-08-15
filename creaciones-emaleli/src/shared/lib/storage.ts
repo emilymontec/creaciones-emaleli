@@ -23,11 +23,11 @@ function safeFilename(filename: string): string {
 }
 
 export function buildStoragePath(
-  bucket: StorageBucket,
+  _bucket: StorageBucket,
   entityId: string,
   filename: string,
 ): string {
-  return `${bucket}/${entityId}/${safeFilename(filename)}`;
+  return `${entityId}/${safeFilename(filename)}`;
 }
 
 export async function uploadFile({

@@ -18,9 +18,7 @@ export async function registrarAvanceProduccion(params: {
   usuarioId?: string;
   orden?: number;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
-    params.pedidoId,
-  );
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,
@@ -52,7 +50,10 @@ export async function obtenerAvancesProduccion(pedidoId: string) {
   return repository.listarAvancesProduccion(pedidoId);
 }
 
-export async function eliminarAvanceProduccion(id: string, pedidoId: string) {
+export async function eliminarAvanceProduccion(
+  id: string,
+  pedidoId: string,
+) {
   const avance = await repository.eliminarAvanceProduccion(id, pedidoId);
   return avance;
 }
@@ -72,9 +73,7 @@ export async function registrarComentarioProduccion(params: {
   usuarioId?: string;
   autorNombre?: string;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
-    params.pedidoId,
-  );
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,
@@ -109,9 +108,7 @@ export async function crearSolicitudCambio(params: {
   creadorPor?: string;
   comentarioInicial?: string;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
-    params.pedidoId,
-  );
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,

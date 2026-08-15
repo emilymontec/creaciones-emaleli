@@ -8,6 +8,7 @@ import { Badge } from "@/src/frontend/components/ui/Badge";
 import { Button } from "@/src/frontend/components/ui/Button";
 import { Modal } from "@/src/frontend/components/ui/Modal";
 import { Table, type TableColumn } from "@/src/frontend/components/ui/Table";
+import { AdminListPagination } from "@/src/frontend/components/shared/AdminListPagination";
 import { ProductForm, type ProductDTO } from "./ProductForm";
 import {
   deleteProductAction,
@@ -32,9 +33,11 @@ function formatPrecio(value: string | number) {
 export function ProductsTable({
   productos: initialProductos,
   categoriaOptions,
+  pagination,
 }: {
   productos: ProductDTO[];
   categoriaOptions: { id: string; nombre: string }[];
+  pagination?: { page: number; totalPages: number; total: number };
 }) {
   const [productos, setProductos] = useState(initialProductos);
   const [prevInitial, setPrevInitial] = useState(initialProductos);
@@ -225,6 +228,15 @@ export function ProductsTable({
           </div>
         )}
       />
+
+      {pagination && pagination.totalPages > 1 && (
+        <AdminListPagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          itemLabel="producto"
+        />
+      )}
 
       <Modal
         open={Boolean(editing)}

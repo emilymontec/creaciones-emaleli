@@ -64,7 +64,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               !multiple && "pr-9",
               "focus:border-primary-500 focus:ring-2 focus:ring-primary-100",
               error
-                ? "border-error focus:border-error focus:ring-red-100"
+                ? "border-error focus:border-error focus:ring-error-light"
                 : "border-gray-200",
               "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400",
               className,

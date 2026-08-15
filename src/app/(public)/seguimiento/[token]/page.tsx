@@ -68,8 +68,7 @@ export default async function SeguimientoPage({
             Pedido no encontrado
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            El enlace de seguimiento no es válido o el pedido ya no está
-            disponible.
+            El enlace de seguimiento no es válido o el pedido ya no está disponible.
           </p>
           <div className="mt-6">
             <Link
@@ -132,9 +131,7 @@ export default async function SeguimientoPage({
               <p className="text-xs text-gray-500">Saldo pendiente</p>
               <p
                 className={`font-semibold ${
-                  Number(p.saldoPendiente) > 0
-                    ? "text-amber-700"
-                    : "text-emerald-700"
+                  Number(p.saldoPendiente) > 0 ? "text-amber-700" : "text-emerald-700"
                 }`}
               >
                 ${Number(p.saldoPendiente).toLocaleString("es-CO")}
@@ -151,8 +148,7 @@ export default async function SeguimientoPage({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-6">
             {ETAPAS.map((e, index) => {
               const Icon = e.icon;
-              const alcanzado =
-                ETAPAS.findIndex((i) => i.estado === p.estado) >= index;
+              const alcanzado = ETAPAS.findIndex((i) => i.estado === p.estado) >= index;
               return (
                 <div
                   key={e.estado}
@@ -163,9 +159,7 @@ export default async function SeguimientoPage({
                   }`}
                 >
                   <Icon className="size-6 mb-1" />
-                  <span className="text-xs font-semibold leading-tight">
-                    {e.label}
-                  </span>
+                  <span className="text-xs font-semibold leading-tight">{e.label}</span>
                 </div>
               );
             })}
@@ -179,10 +173,7 @@ export default async function SeguimientoPage({
               <Truck className="size-5 text-primary-600" /> Información de Envío
             </h2>
             <p className="text-sm text-gray-600">
-              Número de guía:{" "}
-              <strong className="font-mono text-gray-900">
-                {p.envios[0].numeroGuia}
-              </strong>
+              Número de guía: <strong className="font-mono text-gray-900">{p.envios[0].numeroGuia}</strong>
             </p>
             {p.envios[0].enlaceRastreo && (
               <a
@@ -201,15 +192,11 @@ export default async function SeguimientoPage({
         {p.avancesProduccion && p.avancesProduccion.length > 0 && (
           <Card className="p-6">
             <h2 className="mb-4 font-display text-base font-semibold text-gray-900 flex items-center gap-2">
-              <ImageIcon className="size-5 text-primary-600" /> Avances de
-              producción
+              <ImageIcon className="size-5 text-primary-600" /> Avances de producción
             </h2>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {p.avancesProduccion.map((a) => (
-                <div
-                  key={a.id}
-                  className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
-                >
+                <div key={a.id} className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
                   {a.tipo === "IMAGEN" ? (
                     <div className="relative aspect-square w-full bg-gray-100">
                       <img
@@ -235,9 +222,7 @@ export default async function SeguimientoPage({
                       </p>
                     )}
                     {a.descripcion && (
-                      <p className="text-xs text-gray-600 line-clamp-3">
-                        {a.descripcion}
-                      </p>
+                      <p className="text-xs text-gray-600 line-clamp-3">{a.descripcion}</p>
                     )}
                     <time className="block text-[11px] text-gray-400 pt-1">
                       {new Date(a.createdAt).toLocaleString("es-CO")}
@@ -253,8 +238,7 @@ export default async function SeguimientoPage({
         {p.solicitudes && p.solicitudes.length > 0 && (
           <Card className="p-6 space-y-4">
             <h2 className="font-display text-base font-semibold text-gray-900 flex items-center gap-2">
-              <Repeat className="size-5 text-primary-600" /> Solicitudes de
-              cambio
+              <Repeat className="size-5 text-primary-600" /> Solicitudes de cambio
             </h2>
             {p.solicitudes.map((s) => (
               <div
@@ -270,14 +254,10 @@ export default async function SeguimientoPage({
                       {s.estado === "RECHAZADA" && <X className="size-3" />}
                       {SOLICITUD_ESTADO_LABEL[s.estado] || s.estado}
                     </span>
-                    <p className="mt-2 text-sm font-semibold text-gray-900">
-                      {s.descripcion}
-                    </p>
+                    <p className="mt-2 text-sm font-semibold text-gray-900">{s.descripcion}</p>
                     <p className="text-[11px] text-gray-400 mt-0.5">
-                      {s.origen === "CLIENTE"
-                        ? "Solicitada por ti"
-                        : "Solicitud del equipo Emaleli"}{" "}
-                      · {new Date(s.createdAt).toLocaleString("es-CO")}
+                      {s.origen === "CLIENTE" ? "Solicitada por ti" : "Solicitud del equipo Emaleli"} ·{" "}
+                      {new Date(s.createdAt).toLocaleString("es-CO")}
                     </p>
                   </div>
                 </div>
@@ -287,15 +267,10 @@ export default async function SeguimientoPage({
                     <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
                       Respuesta
                       {s.respuestaAt && (
-                        <span className="normal-case text-gray-400 font-normal">
-                          {" "}
-                          · {new Date(s.respuestaAt).toLocaleString("es-CO")}
-                        </span>
+                        <span className="normal-case text-gray-400 font-normal"> · {new Date(s.respuestaAt).toLocaleString("es-CO")}</span>
                       )}
                     </p>
-                    <p className="text-sm text-gray-800">
-                      {s.respuestaCliente}
-                    </p>
+                    <p className="text-sm text-gray-800">{s.respuestaCliente}</p>
                   </div>
                 )}
 
@@ -312,10 +287,7 @@ export default async function SeguimientoPage({
                       >
                         <p className="text-[11px] font-semibold text-gray-500 mb-1">
                           {c.autor}
-                          <span className="font-normal text-gray-400">
-                            {" "}
-                            · {new Date(c.createdAt).toLocaleString("es-CO")}
-                          </span>
+                          <span className="font-normal text-gray-400"> · {new Date(c.createdAt).toLocaleString("es-CO")}</span>
                         </p>
                         <p className="text-gray-800">{c.contenido}</p>
                       </div>
@@ -331,8 +303,7 @@ export default async function SeguimientoPage({
         {p.comentariosProduccion && p.comentariosProduccion.length > 0 && (
           <Card className="p-6 space-y-3">
             <h2 className="font-display text-base font-semibold text-gray-900 flex items-center gap-2">
-              <MessageSquare className="size-5 text-primary-600" /> Comentarios
-              del equipo
+              <MessageSquare className="size-5 text-primary-600" /> Comentarios del equipo
             </h2>
             {p.comentariosProduccion.map((c) => (
               <div
@@ -341,14 +312,9 @@ export default async function SeguimientoPage({
               >
                 <p className="text-[11px] font-semibold text-gray-500 mb-1">
                   {c.autorNombre || "Equipo Emaleli"}
-                  <span className="font-normal text-gray-400">
-                    {" "}
-                    · {new Date(c.createdAt).toLocaleString("es-CO")}
-                  </span>
+                  <span className="font-normal text-gray-400"> · {new Date(c.createdAt).toLocaleString("es-CO")}</span>
                 </p>
-                <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                  {c.contenido}
-                </p>
+                <p className="text-sm text-gray-800 whitespace-pre-wrap">{c.contenido}</p>
               </div>
             ))}
           </Card>
@@ -369,9 +335,7 @@ export default async function SeguimientoPage({
                   {ev.tipo.replace("_", " ")}
                 </p>
                 {ev.descripcion && (
-                  <p className="text-sm text-gray-600 mt-0.5">
-                    {ev.descripcion}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-0.5">{ev.descripcion}</p>
                 )}
                 <time className="text-[11px] text-gray-400">
                   {new Date(ev.createdAt).toLocaleString("es-CO")}
@@ -384,7 +348,7 @@ export default async function SeguimientoPage({
         <div className="text-center pt-2">
           <a
             href={`https://wa.me/573001234567?text=${encodeURIComponent(
-              `Hola, quisiera consultar sobre mi pedido ${p.codigo}`,
+              `Hola, quisiera consultar sobre mi pedido ${p.codigo}`
             )}`}
             target="_blank"
             rel="noreferrer"

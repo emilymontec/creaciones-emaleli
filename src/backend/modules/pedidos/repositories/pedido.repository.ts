@@ -135,8 +135,7 @@ export async function listarPedidosAdmin(filtros: ListarPedidosFiltros = {}) {
 
   const where: Prisma.PedidoWhereInput = {};
   if (filtros.estado) where.estado = filtros.estado as any;
-  if (filtros.ciudad)
-    where.ciudad = { contains: filtros.ciudad, mode: "insensitive" };
+  if (filtros.ciudad) where.ciudad = { contains: filtros.ciudad, mode: "insensitive" };
   if (filtros.cliente) {
     where.cliente = {
       OR: [
@@ -159,9 +158,7 @@ export async function listarPedidosAdmin(filtros: ListarPedidosFiltros = {}) {
       take: perPage,
       orderBy: { fechaPedido: "desc" },
       include: {
-        cliente: {
-          select: { id: true, nombre: true, whatsapp: true, ciudad: true },
-        },
+        cliente: { select: { id: true, nombre: true, whatsapp: true, ciudad: true } },
         _count: { select: { items: true, pagos: true } },
         pagos: { select: { monto: true, tipo: true, fecha: true } },
       },
@@ -283,13 +280,7 @@ export async function buscarPedidoPorTokenPublico(token: string) {
       items: true,
       pagos: {
         orderBy: { fecha: "desc" },
-        select: {
-          id: true,
-          tipo: true,
-          monto: true,
-          fecha: true,
-          metodo: true,
-        },
+        select: { id: true, tipo: true, monto: true, fecha: true, metodo: true },
       },
       envios: true,
       archivos: true,
@@ -341,13 +332,7 @@ export async function buscarPedidoPorTokenPublico(token: string) {
       },
       timeline: {
         orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          tipo: true,
-          estadoNuevo: true,
-          descripcion: true,
-          createdAt: true,
-        },
+        select: { id: true, tipo: true, estadoNuevo: true, descripcion: true, createdAt: true },
       },
     },
   });
@@ -361,15 +346,10 @@ export async function registrarPagoTransaccion(params: {
   usuarioId?: string;
 }) {
   return prisma.$transaction(async (tx) => {
-    const pedido = await tx.pedido.findUnique({
-      where: { id: params.pedidoId },
-    });
+    const pedido = await tx.pedido.findUnique({ where: { id: params.pedidoId } });
     if (!pedido) throw new Error("Pedido no encontrado.");
 
-    const nuevoSaldo = Math.max(
-      0,
-      Number(pedido.saldoPendiente) - params.monto,
-    );
+    const nuevoSaldo = Math.max(0, Number(pedido.saldoPendiente) - params.monto);
 
     const pago = await tx.pago.create({
       data: {
@@ -457,3 +437,4 @@ export async function listarCiudadesPedido() {
   });
   return rows.map((r) => r.ciudad).filter(Boolean) as string[];
 }
+
