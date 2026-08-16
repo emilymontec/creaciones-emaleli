@@ -8,6 +8,7 @@ interface ProductoConTarjeta {
   precioDescuento: unknown;
   tiempoProduccion: number | null;
   estado: string;
+  seoImagen?: string | null;
   imagenes: { url: string }[];
   categorias: { nombre: string }[];
 }
@@ -24,7 +25,8 @@ export function mapProductCard(producto: ProductoConTarjeta): ProductCardDTO {
         : null,
     tiempoProduccion: producto.tiempoProduccion,
     estado: producto.estado,
-    imagenUrl: producto.imagenes[0]?.url ?? null,
+    imagenUrl:
+      producto.imagenes[0]?.url ?? producto.seoImagen ?? null,
     categoriaNombre: producto.categorias[0]?.nombre,
   };
 }

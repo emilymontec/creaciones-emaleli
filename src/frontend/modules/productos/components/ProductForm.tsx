@@ -31,6 +31,7 @@ export interface ProductDTO {
   seoDescripcion: string | null;
   seoImagen: string | null;
   categorias: { id: string; nombre: string }[];
+  imagenes: { url: string }[];
 }
 
 const ESTADO_OPTIONS = [

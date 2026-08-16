@@ -92,7 +92,7 @@ export function PublicHeader() {
               Creaciones Emaleli
             </span>
             <span className="text-[10px] font-semibold text-secondary-600 uppercase tracking-widest">
-              Regalos Personalizados
+              Detalles Personalizados
             </span>
           </div>
         </Link>

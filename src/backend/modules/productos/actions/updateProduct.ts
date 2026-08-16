@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ProductUpdateSchema } from "../schemas/product.schema";
 import { updateProduct } from "../services/product.service";
+import { ensurePrincipalFromSeo } from "../services/gallery.service";
 import { toErrorMessage } from "@/src/shared/lib/errors";
 import {
   getOptionalFile,
@@ -49,6 +50,10 @@ export async function updateProductAction(
       : result.data.seoImagen;
 
     await updateProduct({ ...result.data, seoImagen });
+
+    if (seoImagen) {
+      await ensurePrincipalFromSeo(result.data.id, seoImagen);
+    }
 
     revalidatePath("/admin/productos");
 

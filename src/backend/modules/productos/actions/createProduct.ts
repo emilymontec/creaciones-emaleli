@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
 import { ProductSchema } from "../schemas/product.schema";
 import { createProduct } from "../services/product.service";
+import { ensurePrincipalFromSeo } from "../services/gallery.service";
 import { toErrorMessage } from "@/src/shared/lib/errors";
 import {
   getOptionalFile,
@@ -54,7 +55,11 @@ export async function createProductAction(
       ? await uploadCatalogImage(`producto-${randomUUID()}`, seoImagenFile)
       : undefined;
 
-    await createProduct({ ...result.data, seoImagen });
+    const producto = await createProduct({ ...result.data, seoImagen });
+
+    if (seoImagen) {
+      await ensurePrincipalFromSeo(producto.id, seoImagen);
+    }
 
     revalidatePath("/admin/productos");
 

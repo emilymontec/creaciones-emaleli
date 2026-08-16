@@ -2,7 +2,10 @@ import { prisma } from "@/src/backend/shared/prisma";
 import { Prisma } from "@/generated/prisma/client";
 
 const publicCardInclude = {
-  imagenes: { where: { principal: true }, take: 1 },
+  imagenes: {
+    orderBy: [{ principal: "desc" as const }, { orden: "asc" as const }],
+    take: 1,
+  },
   categorias: { select: { id: true, nombre: true, slug: true } },
 } satisfies Prisma.ProductoInclude;
 

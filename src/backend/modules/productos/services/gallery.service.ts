@@ -30,6 +30,30 @@ export async function addImagen(productoId: string, url: string) {
   });
 }
 
+/** Si el producto no tiene GALERÍA AÚN y cuenta con `seoImagen`, la añade
+ *  automáticamente como imagen principal para que se muestre en la tienda
+ *  pública (detalle + catálogo). Idempotente: si ya existe una imagen con
+ *  la misma URL no duplica. */
+export async function ensurePrincipalFromSeo(
+  productoId: string,
+  seoImagen: string | null | undefined,
+) {
+  if (!seoImagen) return null;
+
+  const count = await repository.count(productoId);
+  if (count > 0) return null;
+
+  const existentes = await repository.findByProducto(productoId);
+  if (existentes.some((img) => img.url === seoImagen)) return null;
+
+  return repository.create({
+    productoId,
+    url: seoImagen,
+    principal: true,
+    orden: 1,
+  });
+}
+
 export async function removeImagen(id: string) {
   const imagen = await repository.findById(id);
 

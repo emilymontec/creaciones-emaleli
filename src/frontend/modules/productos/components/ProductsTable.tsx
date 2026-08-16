@@ -108,10 +108,10 @@ export function ProductsTable({
       render: (p) => (
         <div className="flex items-center gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-input bg-gray-100">
-            {p.seoImagen ? (
+            {p.imagenes[0]?.url ?? p.seoImagen ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={p.seoImagen}
+                src={p.imagenes[0]?.url ?? p.seoImagen!}
                 alt={p.nombre}
                 className="size-full object-cover"
               />

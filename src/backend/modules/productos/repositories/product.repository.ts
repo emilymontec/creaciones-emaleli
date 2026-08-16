@@ -3,6 +3,10 @@ import { Prisma } from "@/generated/prisma/client";
 
 const listInclude = {
   categorias: { select: { id: true, nombre: true } },
+  imagenes: {
+    orderBy: [{ principal: "desc" as const }, { orden: "asc" as const }],
+    take: 1,
+  },
 } satisfies Prisma.ProductoInclude;
 
 const DEFAULT_PAGE_SIZE = 20;
