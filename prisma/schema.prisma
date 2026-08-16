@@ -130,6 +130,7 @@ model Usuario {
 
   eventosTimeline EventoTimeline[]
   pagos           Pago[]
+  facturas        Factura[]
   avancesProduccion ProduccionAvance[]
   comentariosProduccion ComentarioProduccion[]
 
@@ -275,6 +276,7 @@ model Pedido {
 
   items           ItemPedido[]
   pagos           Pago[]
+  factura         Factura?
   envios          Envio[]
   archivos        ArchivoAdjunto[]
   solicitudes     SolicitudCambio[]
@@ -309,16 +311,18 @@ model ItemPedido {
 }
 
 model Pago {
-  id          String            @id @default(cuid())
-  pedidoId    String
-  pedido      Pedido            @relation(fields: [pedidoId], references: [id])
-  tipo        TipoPago
-  monto       Decimal           @db.Decimal(10, 2)
-  fecha       DateTime          @default(now())
-  metodo      String
-  usuarioId   String?
-  usuario     Usuario?          @relation(fields: [usuarioId], references: [id])
-  comprobante ArchivoAdjunto?
+  id              String            @id @default(cuid())
+  pedidoId        String
+  pedido          Pedido            @relation(fields: [pedidoId], references: [id])
+  tipo            TipoPago
+  monto           Decimal           @db.Decimal(10, 2)
+  fecha           DateTime          @default(now())
+  metodo          String
+  notas           String?
+  usuarioId       String?
+  usuario         Usuario?          @relation(fields: [usuarioId], references: [id])
+  comprobanteId   String?           @unique
+  comprobante     ArchivoAdjunto?   @relation("ComprobantePago", fields: [comprobanteId], references: [id])
 
   @@index([pedidoId])
 }
@@ -343,19 +347,37 @@ model Envio {
 }
 
 model ArchivoAdjunto {
-  id        String          @id @default(cuid())
-  pedidoId  String?
-  pedido    Pedido?         @relation(fields: [pedidoId], references: [id])
-  pagoId    String?         @unique
-  pago      Pago?           @relation(fields: [pagoId], references: [id])
-  origen    OrigenArchivo   @default(CLIENTE)
-  tipo      String
-  url       String
-  nombre    String?
+  id              String          @id @default(cuid())
+  pedidoId        String?
+  pedido          Pedido?         @relation(fields: [pedidoId], references: [id])
+  pagoComprobante Pago?           @relation("ComprobantePago")
+  origen          OrigenArchivo   @default(CLIENTE)
+  tipo            String
+  url             String
+  nombre          String?
 
-  createdAt DateTime        @default(now())
+  createdAt       DateTime        @default(now())
 
   @@index([pedidoId])
+}
+
+model Factura {
+  id             String        @id @default(cuid())
+  pedidoId       String        @unique
+  pedido         Pedido        @relation(fields: [pedidoId], references: [id])
+  numero         String?       @unique
+  estado         EstadoFactura @default(PENDIENTE)
+  urlPdf         String?
+  fechaEmision   DateTime?
+  fechaAnulacion DateTime?
+  notas          String?
+  usuarioId      String?
+  usuario        Usuario?      @relation(fields: [usuarioId], references: [id])
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([estado])
 }
 
 model SolicitudCambio {

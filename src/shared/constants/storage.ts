@@ -2,6 +2,7 @@ export const STORAGE_BUCKETS = {
   PRODUCTOS: process.env.SUPABASE_BUCKET_PRODUCTOS || "productos",
   PEDIDOS_ARCHIVOS: "pedidos-archivos",
   PEDIDOS_COMPROBANTES: "pedidos-comprobantes",
+  PEDIDOS_FACTURAS: "pedidos-facturas",
   PRODUCCION_AVANCES: "produccion-avances",
   CONFIGURACION: "configuracion",
 } as const;
@@ -24,6 +25,10 @@ export const STORAGE_POLICIES: Record<
   [STORAGE_BUCKETS.PEDIDOS_COMPROBANTES]: {
     publico: false,
     descripcion: "Comprobantes de pago (privado).",
+  },
+  [STORAGE_BUCKETS.PEDIDOS_FACTURAS]: {
+    publico: false,
+    descripcion: "Facturas PDF emitidas (privado).",
   },
   [STORAGE_BUCKETS.PRODUCCION_AVANCES]: {
     publico: true,
@@ -52,6 +57,10 @@ export const STORAGE_LIMITS: Record<
   [STORAGE_BUCKETS.PEDIDOS_COMPROBANTES]: {
     maxBytes: 5 * MB,
     allowedTypes: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
+  },
+  [STORAGE_BUCKETS.PEDIDOS_FACTURAS]: {
+    maxBytes: 10 * MB,
+    allowedTypes: ["application/pdf"],
   },
   [STORAGE_BUCKETS.PRODUCCION_AVANCES]: {
     maxBytes: 50 * MB,

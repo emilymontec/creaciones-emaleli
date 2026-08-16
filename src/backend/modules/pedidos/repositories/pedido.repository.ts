@@ -187,6 +187,14 @@ export async function obtenerPedidoDetalleAdmin(id: string) {
       items: true,
       pagos: {
         orderBy: { fecha: "desc" },
+        include: {
+          usuario: { select: { id: true, nombre: true } },
+          comprobante: {
+            select: { id: true, url: true, nombre: true, tipo: true },
+          },
+        },
+      },
+      factura: {
         include: { usuario: { select: { id: true, nombre: true } } },
       },
       envios: true,

@@ -19,6 +19,11 @@ import {
   Send,
   Truck,
   User as UserIcon,
+  Upload,
+  Download,
+  FileCheck,
+  AlertTriangle,
+  Receipt,
 } from "lucide-react";
 import { Card, CardHeader } from "@/src/frontend/components/ui/Card";
 import { Input } from "@/src/frontend/components/ui/Input";
@@ -37,11 +42,21 @@ import {
   obtenerDetallePedidoAction,
   cambiarEstadoPedidoAction,
   agregarComentarioAction,
-  registrarPagoAction,
   actualizarEnvioAction,
   type DetallePedidoState,
   type ActionState,
 } from "@/src/backend/modules/pedidos/actions/managePedidos";
+import {
+  registrarPagoConComprobanteAction,
+  gestionarFacturaAction,
+  type PagoActionState,
+  type FacturaActionState,
+} from "@/src/backend/modules/pagos/actions/managePagos";
+import {
+  ESTADO_FACTURA_COLOR,
+  ESTADO_FACTURA_LABEL,
+  TIPO_PAGO_LABEL,
+} from "@/src/backend/modules/pagos/schemas/pago.schema";
 import { useToast } from "@/src/frontend/providers/ToastProvider";
 import type { EstadoPedido, TipoEventoTimeline } from "@/generated/prisma/client";
 import { ProduccionSection } from "./ProduccionSection";
@@ -68,6 +83,8 @@ const TIPO_EVENTO_LABEL: Record<string, string> = {
 
 const initialDetalle: DetallePedidoState = { success: false };
 const initialAction: ActionState = { success: false };
+const initialPago: PagoActionState = { success: false };
+const initialFactura: FacturaActionState = { success: false };
 
 export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
   const router = useRouter();
@@ -84,8 +101,12 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     initialAction,
   );
   const [pagoState, pagoDispatch, pagoPending] = useActionState(
-    registrarPagoAction,
-    initialAction,
+    registrarPagoConComprobanteAction,
+    initialPago,
+  );
+  const [facturaState, facturaDispatch, facturaPending] = useActionState(
+    gestionarFacturaAction,
+    initialFactura,
   );
   const [envioState, envioDispatch, envioPending] = useActionState(
     actualizarEnvioAction,
@@ -94,6 +115,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
   const [comentario, setComentario] = useState("");
   const [pagoModalOpen, setPagoModalOpen] = useState(false);
   const [envioModalOpen, setEnvioModalOpen] = useState(false);
+  const [facturaModalOpen, setFacturaModalOpen] = useState(false);
+  const [comprobantePreview, setComprobantePreview] = useState<File | null>(
+    null,
+  );
+  const [facturaPdfPreview, setFacturaPdfPreview] = useState<File | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -150,6 +176,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     if (pagoState.success) {
       toast({ title: pagoState.message ?? "Pago registrado", variant: "success" });
       setPagoModalOpen(false);
+      setComprobantePreview(null);
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
         setDetalle(res);
@@ -159,6 +186,28 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagoState]);
+
+  useEffect(() => {
+    if (facturaState.success) {
+      toast({
+        title: facturaState.message ?? "Factura actualizada",
+        variant: "success",
+      });
+      setFacturaModalOpen(false);
+      setFacturaPdfPreview(null);
+      startTransition(async () => {
+        const res = await obtenerDetallePedidoAction(pedidoId);
+        setDetalle(res);
+      });
+    } else if (facturaState.error) {
+      toast({
+        title: "Error al gestionar factura",
+        description: facturaState.error,
+        variant: "error",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facturaState]);
 
   useEffect(() => {
     if (envioState.success) {
@@ -484,31 +533,134 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 {p.pagos.map((pago: any) => (
                   <li
                     key={pago.id}
-                    className="flex items-center justify-between rounded-input border border-gray-100 bg-gray-50/50 px-3 py-2"
+                    className="rounded-input border border-gray-100 bg-gray-50/50 px-3 py-2"
                   >
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {pago.tipo === "ANTICIPO"
-                          ? "Anticipo"
-                          : pago.tipo === "ABONO"
-                            ? "Abono"
-                            : "Pago final"}
-                        <span className="ml-2 text-xs font-normal text-gray-500">
-                          · {pago.metodo}
-                        </span>
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(pago.fecha).toLocaleString("es-CO")}
-                        {pago.usuario?.nombre &&
-                          ` · Registro: ${pago.usuario.nombre}`}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {TIPO_PAGO_LABEL[pago.tipo] ?? pago.tipo}
+                            <span className="ml-2 text-xs font-normal text-gray-500">
+                              · {pago.metodo}
+                            </span>
+                          </p>
+                          {pago.comprobante && (
+                            <a
+                              href={pago.comprobante.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex h-6 items-center gap-1 rounded-lg bg-primary-50 px-2 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                              title="Ver comprobante de pago"
+                            >
+                              <FileCheck className="size-3.5" />
+                              Comprobante
+                            </a>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {new Date(pago.fecha).toLocaleString("es-CO")}
+                          {pago.usuario?.nombre &&
+                            ` · Registro: ${pago.usuario.nombre}`}
+                        </p>
+                        {pago.notas && (
+                          <p className="mt-1 text-xs text-gray-600 whitespace-pre-wrap">
+                            {pago.notas}
+                          </p>
+                        )}
+                      </div>
+                      <p className="shrink-0 font-display font-bold text-emerald-700 tabular-nums">
+                        ${Number(pago.monto).toLocaleString("es-CO")}
                       </p>
                     </div>
-                    <p className="font-display font-bold text-emerald-700 tabular-nums">
-                      ${Number(pago.monto).toLocaleString("es-CO")}
-                    </p>
                   </li>
                 ))}
               </ul>
+            )}
+          </Card>
+
+          <Card>
+            <CardHeader
+              title={
+                <div className="flex items-center gap-2">
+                  <Receipt className="size-4 text-primary-600" />
+                  Facturación
+                </div>
+              }
+              action={
+                <Button size="sm" variant="secondary" onClick={() => setFacturaModalOpen(true)}>
+                  Gestionar
+                </Button>
+              }
+            />
+            {p.factura ? (
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-gray-500">Estado</p>
+                  <span
+                    className={clsx(
+                      "rounded-full border px-2 py-0.5 text-xs font-semibold",
+                      ESTADO_FACTURA_COLOR[p.factura.estado],
+                    )}
+                  >
+                    {ESTADO_FACTURA_LABEL[p.factura.estado]}
+                  </span>
+                </div>
+                {p.factura.numero && (
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-500">Número</p>
+                    <p className="font-mono font-semibold text-gray-900">{p.factura.numero}</p>
+                  </div>
+                )}
+                {p.factura.fechaEmision && (
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-500">Fecha emisión</p>
+                    <p className="text-gray-800">
+                      {new Date(p.factura.fechaEmision).toLocaleDateString("es-CO")}
+                    </p>
+                  </div>
+                )}
+                {p.factura.urlPdf && (
+                  <a
+                    href={p.factura.urlPdf}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-input border border-primary-100 bg-primary-50/50 px-3 py-2 hover:bg-primary-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileText className="size-4 text-primary-600" />
+                      <p className="text-sm font-semibold text-primary-800">
+                        {p.factura.numero ? `Factura ${p.factura.numero}.pdf` : "Factura PDF"}
+                      </p>
+                    </div>
+                    <Download className="size-4 text-primary-700" />
+                  </a>
+                )}
+                {p.factura.notas && (
+                  <div className="rounded-input bg-gray-50 p-2">
+                    <p className="text-xs font-semibold text-gray-500 mb-1">Notas</p>
+                    <p className="text-xs text-gray-700 whitespace-pre-wrap">{p.factura.notas}</p>
+                  </div>
+                )}
+                {p.factura.usuario?.nombre && (
+                  <p className="text-xs text-gray-500">
+                    Última actualización: {p.factura.usuario.nombre}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 rounded-input border border-dashed border-amber-200 bg-amber-50/50 px-3 py-2">
+                  <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-amber-800">
+                      Sin factura registrada
+                    </p>
+                    <p className="text-xs text-amber-700">
+                      El pedido aún no tiene estado de facturación definido.
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
           </Card>
 
@@ -716,40 +868,112 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
       {/* Modal Registrar Pago */}
       <Modal
         open={pagoModalOpen}
-        onClose={() => setPagoModalOpen(false)}
+        onClose={() => {
+          setPagoModalOpen(false);
+          setComprobantePreview(null);
+        }}
         title="Registrar Pago"
         description={`Saldo pendiente actual: $${Number(p.saldoPendiente).toLocaleString("es-CO")}`}
       >
-        <form action={pagoDispatch} className="space-y-4">
+        <form action={pagoDispatch} className="space-y-4" encType="multipart/form-data">
           <input type="hidden" name="pedidoId" value={p.id} />
-          <Select
-            name="tipo"
-            label="Tipo de pago"
-            defaultValue="ABONO"
-            options={[
-              { value: "ANTICIPO", label: "Anticipo" },
-              { value: "ABONO", label: "Abono parcial" },
-              { value: "PAGO_FINAL", label: "Pago final / Cancela saldo" },
-            ]}
-          />
+          <div className="space-y-2">
+            <Select
+              name="tipo"
+              label="Tipo de pago"
+              defaultValue="ABONO"
+              options={[
+                { value: "ANTICIPO", label: "Anticipo" },
+                { value: "ABONO", label: "Abono parcial" },
+                { value: "PAGO_FINAL", label: "Pago final / Cancela saldo" },
+              ]}
+              error={pagoState.errors?.tipo?.[0]}
+            />
+            <p className="text-xs text-gray-500">
+              <AlertTriangle className="size-3 inline align-text-bottom mr-1 text-amber-500" />
+              <strong>Pago final</strong> valida que el monto coincida exactamente con el saldo pendiente.
+            </p>
+          </div>
           <Input
             name="monto"
             label="Monto ($ COP)"
             type="number"
+            step="1"
+            min={0.01}
             defaultValue={Number(p.saldoPendiente) > 0 ? Number(p.saldoPendiente) : undefined}
             placeholder="0"
             required
+            error={pagoState.errors?.monto?.[0]}
           />
           <Select
             name="metodo"
             label="Método de pago"
             defaultValue="Transferencia Bancaria"
             options={[
-              { value: "Transferencia Bancaria", label: "Transferencia (Bancolombia / Nequi / Daviplata)" },
+              { value: "Transferencia Bancaria", label: "Transferencia Bancaria" },
+              { value: "Nequi", label: "Nequi" },
+              { value: "Daviplata", label: "Daviplata" },
               { value: "Efectivo", label: "Efectivo" },
               { value: "Tarjeta Débito/Crédito", label: "Tarjeta Débito / Crédito" },
+              { value: "Cheque", label: "Cheque" },
             ]}
+            error={pagoState.errors?.metodo?.[0]}
           />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-gray-700">
+              Fecha (opcional, por defecto ahora)
+            </label>
+            <input
+              type="datetime-local"
+              name="fecha"
+              className="h-10 w-full rounded-input border border-gray-200 bg-white px-3 text-sm text-gray-900 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            />
+          </div>
+          <Textarea
+            name="notas"
+            label="Notas internas (opcional)"
+            placeholder="Referencia de pago, número de transacción, observaciones..."
+            rows={2}
+            error={pagoState.errors?.notas?.[0]}
+          />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-gray-700">
+              Comprobante de pago (imagen o PDF · opcional)
+            </label>
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-input border-2 border-dashed border-gray-300 bg-gray-50/50 px-4 py-5 hover:border-primary-300 hover:bg-primary-50/30">
+              <Upload className="size-5 text-gray-400" />
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-700">
+                  {comprobantePreview ? comprobantePreview.name : "Subir comprobante"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Máximo 5 MB · JPG, PNG, WebP o PDF
+                </p>
+              </div>
+              <input
+                type="file"
+                name="comprobante"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setComprobantePreview(file);
+                }}
+              />
+            </label>
+            {comprobantePreview && (
+              <p className="mt-1 text-xs text-primary-700">
+                ✓ Archivo seleccionado: {comprobantePreview.name} (
+                {(comprobantePreview.size / 1024).toFixed(1)} KB)
+              </p>
+            )}
+          </div>
+          {pagoState.error && (
+            <div className="rounded-input bg-red-50 p-3 border border-red-200">
+              <p className="text-xs font-semibold text-red-800">No se pudo registrar el pago</p>
+              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">{pagoState.error}</p>
+            </div>
+          )}
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="ghost" onClick={() => setPagoModalOpen(false)}>
               Cancelar
@@ -800,6 +1024,98 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             </Button>
             <Button type="submit" loading={envioPending}>
               Guardar Guía
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Modal Gestionar Factura */}
+      <Modal
+        open={facturaModalOpen}
+        onClose={() => {
+          setFacturaModalOpen(false);
+          setFacturaPdfPreview(null);
+        }}
+        title="Gestionar Facturación"
+        description={`Facturación del pedido ${p.codigo} · Total: $${Number(p.total).toLocaleString("es-CO")}`}
+      >
+        <form action={facturaDispatch} className="space-y-4" encType="multipart/form-data">
+          <input type="hidden" name="pedidoId" value={p.id} />
+          <Select
+            name="estado"
+            label="Estado de facturación"
+            defaultValue={p.factura?.estado || "PENDIENTE"}
+            options={[
+              { value: "PENDIENTE", label: "Pendiente por emitir" },
+              { value: "EMITIDA", label: "Emitida (factura enviada)" },
+              { value: "ANULADA", label: "Anulada" },
+            ]}
+            error={facturaState.errors?.estado?.[0]}
+          />
+          <Input
+            name="numero"
+            label="Número de factura (opcional)"
+            defaultValue={p.factura?.numero || ""}
+            placeholder="Ej: FV-2026-00042"
+            error={facturaState.errors?.numero?.[0]}
+          />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-gray-700">
+              PDF de factura (solo PDF · opcional)
+            </label>
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-input border-2 border-dashed border-gray-300 bg-gray-50/50 px-4 py-5 hover:border-primary-300 hover:bg-primary-50/30">
+              <Upload className="size-5 text-gray-400" />
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-700">
+                  {facturaPdfPreview ? facturaPdfPreview.name : p.factura?.urlPdf ? "Reemplazar PDF existente" : "Subir factura PDF"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Máximo 10 MB · solo PDF
+                </p>
+              </div>
+              <input
+                type="file"
+                name="facturaPdf"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setFacturaPdfPreview(file);
+                }}
+              />
+            </label>
+            {facturaPdfPreview && (
+              <p className="mt-1 text-xs text-primary-700">
+                ✓ Archivo seleccionado: {facturaPdfPreview.name} (
+                {(facturaPdfPreview.size / 1024).toFixed(1)} KB)
+              </p>
+            )}
+            {!facturaPdfPreview && p.factura?.urlPdf && (
+              <p className="mt-1 text-xs text-gray-500">
+                Ya hay un PDF cargado. Si no seleccionas uno nuevo, se conservará el actual.
+              </p>
+            )}
+          </div>
+          <Textarea
+            name="notas"
+            label="Notas de facturación (opcional)"
+            defaultValue={p.factura?.notas || ""}
+            placeholder="Observaciones fiscales, retenciones, resolución DIAN..."
+            rows={2}
+            error={facturaState.errors?.notas?.[0]}
+          />
+          {facturaState.error && (
+            <div className="rounded-input bg-red-50 p-3 border border-red-200">
+              <p className="text-xs font-semibold text-red-800">No se pudo actualizar la factura</p>
+              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">{facturaState.error}</p>
+            </div>
+          )}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="ghost" onClick={() => setFacturaModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" loading={facturaPending}>
+              Guardar Factura
             </Button>
           </div>
         </form>

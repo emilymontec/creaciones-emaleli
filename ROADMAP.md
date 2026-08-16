@@ -393,27 +393,27 @@
 
 ### 9.1 Anticipos
 
-- [ ] Registrar anticipo (monto, fecha, método de pago)
+- [x] Registrar anticipo (monto, fecha, método de pago)
 
 ### 9.2 Abonos
 
-- [ ] Registrar abonos parciales adicionales
-- [ ] Cálculo automático de saldo pendiente
+- [x] Registrar abonos parciales adicionales
+- [x] Cálculo automático de saldo pendiente
 
 ### 9.3 Pago final
 
-- [ ] Registrar pago final
-- [ ] Validación de que el total pagado coincide con el total del pedido
+- [x] Registrar pago final
+- [x] Validación de que el total pagado coincide con el total del pedido
 
 ### 9.4 Comprobantes
 
-- [ ] Subida de archivos de comprobante de pago (imagen/PDF)
-- [ ] Asociación de comprobante a cada pago registrado
+- [x] Subida de archivos de comprobante de pago (imagen/PDF)
+- [x] Asociación de comprobante a cada pago registrado
 
 ### 9.5 Facturación
 
-- [ ] Subida de PDF de factura
-- [ ] Estado de facturación (pendiente, emitida, anulada)
+- [x] Subida de PDF de factura
+- [x] Estado de facturación (pendiente, emitida, anulada)
 
 **Entregable de la fase:** control financiero por pedido con trazabilidad de anticipos, abonos, pago final y comprobantes.
 
