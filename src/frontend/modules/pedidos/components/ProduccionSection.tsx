@@ -41,10 +41,15 @@ import type {
   ProduccionAvance,
   ComentarioProduccion,
   SolicitudCambio,
+  ComentarioSolicitud,
   EstadoSolicitudCambio,
 } from "@/generated/prisma/client";
 
 const initialAction: ProduccionActionState = { success: false };
+
+type SolicitudCambioConComentarios = SolicitudCambio & {
+  comentarios: ComentarioSolicitud[];
+};
 
 const SOLICITUD_ESTADO_LABEL: Record<string, string> = {
   ABIERTA: "Abierta",
@@ -107,7 +112,9 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
   const [estadoRespuesta, setEstadoRespuesta] = useState("EN_REVISION");
   const [avances, setAvances] = useState<ProduccionAvance[]>([]);
   const [comentarios, setComentarios] = useState<ComentarioProduccion[]>([]);
-  const [solicitudes, setSolicitudes] = useState<SolicitudCambio[]>([]);
+  const [solicitudes, setSolicitudes] = useState<
+    SolicitudCambioConComentarios[]
+  >([]);
 
   const recargar = async () => {
     startTransition(async () => {
@@ -524,7 +531,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <p className="text-xs font-semibold text-gray-700">
-                    {(c.usuario as any)?.nombre || c.autorNombre || "Equipo"}
+                    {c.autorNombre || "Equipo"}
                     <span className="font-normal text-gray-400 ml-2">
                       · {new Date(c.createdAt).toLocaleString("es-CO")}
                     </span>
@@ -614,7 +621,6 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     <Select
-                      size="sm"
                       value={s.estado}
                       onChange={(e) =>
                         handleCambiarEstadoSolicitud(
@@ -656,12 +662,12 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                   </div>
                 )}
 
-                {(s.comentarios as any[])?.length > 0 && (
+                {s.comentarios.length > 0 && (
                   <div className="mt-4 space-y-2">
                     <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                      Comentarios ({(s.comentarios as any[]).length})
+                      Comentarios ({s.comentarios.length})
                     </p>
-                    {(s.comentarios as any[]).map((c: any) => (
+                    {s.comentarios.map((c) => (
                       <div
                         key={c.id}
                         className={clsx(
@@ -819,7 +825,6 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                 Visible para el cliente
               </label>
               <Select
-                size="sm"
                 name="origen"
                 label=""
                 defaultValue="ADMIN"

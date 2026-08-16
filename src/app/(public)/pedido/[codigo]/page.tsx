@@ -4,9 +4,10 @@ import { obtenerPedidoPorCodigo } from "@/src/backend/modules/pedidos/services/p
 export default async function PedidoCodigoRedirectPage({
   params,
 }: {
-  params: { codigo: string };
+  params: Promise<{ codigo: string }>;
 }) {
-  const pedido = await obtenerPedidoPorCodigo(params.codigo.toUpperCase());
+  const { codigo } = await params;
+  const pedido = await obtenerPedidoPorCodigo(codigo.toUpperCase());
   if (pedido?.tokenSeguimiento) {
     redirect(`/seguimiento/${pedido.tokenSeguimiento}`);
   }

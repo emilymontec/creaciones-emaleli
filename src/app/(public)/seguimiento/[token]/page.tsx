@@ -56,9 +56,10 @@ const SOLICITUD_ESTADO_LABEL: Record<string, string> = {
 export default async function SeguimientoPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  const res = await obtenerSeguimientoPublicoAction(params.token);
+  const { token } = await params;
+  const res = await obtenerSeguimientoPublicoAction(token);
 
   if (!res.success || !res.data) {
     return (

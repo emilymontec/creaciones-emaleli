@@ -68,6 +68,8 @@ export const TIPO_EVENTO_LABEL: Record<TipoEventoTimeline, string> = {
   ENVIO_GENERADO: "Envío generado",
   COMENTARIO_INTERNO: "Comentario interno",
   PRODUCCION_AVANCE: "Avance de producción",
+  COMENTARIO_CLIENTE: "Comentario del cliente",
+  SOLICITUD_CAMBIO: "Solicitud de cambio",
 };
 
 export const ListarPedidosSchema = z.object({

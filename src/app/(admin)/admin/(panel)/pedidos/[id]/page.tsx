@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: "Detalle de pedido | Emaleli Admin",
 };
 
-export default function PedidoDetalleRoute({
+export default async function PedidoDetalleRoute({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const id = params.id;
+  const { id } = await params;
   return (
     <Suspense
       fallback={

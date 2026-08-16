@@ -4,7 +4,7 @@ import { obtenerProduccionCompletaAction } from "@/src/backend/modules/pedidos/a
 
 export async function GET(
   _request: Request,
-  context: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
   const user = await getSessionUser();
   if (!user) {
@@ -14,7 +14,8 @@ export async function GET(
     );
   }
 
-  const res = await obtenerProduccionCompletaAction(context.params.id);
+  const { id } = await context.params;
+  const res = await obtenerProduccionCompletaAction(id);
   return NextResponse.json(res, {
     status: res.success ? 200 : 400,
   });
