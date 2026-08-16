@@ -49,10 +49,15 @@ export default async function ProductoPage({
               : null,
           tiempoProduccion: producto.tiempoProduccion,
           estado: producto.estado,
-          imagenes: producto.imagenes.map((i: Imagen) => ({
-            id: i.id,
-            url: i.url,
-          })),
+          imagenes:
+            producto.imagenes.length > 0
+              ? producto.imagenes.map((i: Imagen) => ({
+                  id: i.id,
+                  url: i.url,
+                }))
+              : producto.seoImagen
+                ? [{ id: "seo", url: producto.seoImagen }]
+                : [],
           variantes: producto.variantes.map((v: Variante) => ({
             id: v.id,
             nombre: v.nombre,
