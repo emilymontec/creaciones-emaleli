@@ -117,12 +117,20 @@ export function CategoriasTable({
     <>
       <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/70 text-gray-500">
+          <tr className="border-b border-gray-100 bg-gradient-to-br from-gray-50/80 to-white text-gray-500">
             <th className="w-10 px-4 py-3" />
-            <th className="px-4 py-3 font-semibold">Categoría</th>
-            <th className="px-4 py-3 font-semibold">Slug</th>
-            <th className="px-4 py-3 font-semibold">Orden</th>
-            <th className="px-4 py-3 font-semibold">Estado</th>
+            <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider">
+              Categoría
+            </th>
+            <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider">
+              Slug
+            </th>
+            <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider">
+              Orden
+            </th>
+            <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider">
+              Estado
+            </th>
             <th className="px-4 py-3" />
           </tr>
         </thead>

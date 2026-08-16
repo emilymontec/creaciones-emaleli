@@ -20,7 +20,13 @@ export function AdminTopbar({ userName, onOpenMobileNav }: AdminTopbarProps) {
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-gray-100 bg-white/90 px-4 backdrop-blur sm:gap-4 sm:px-6">
+    <header className="relative sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-gray-100 bg-white/90 px-4 backdrop-blur sm:gap-4 sm:px-6">
+      {/* Línea de acento de marca (coral → rosa → lavanda → turquesa) */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-marquee-gradient"
+        aria-hidden
+      />
+
       <button
         type="button"
         onClick={onOpenMobileNav}
@@ -47,7 +53,7 @@ export function AdminTopbar({ userName, onOpenMobileNav }: AdminTopbarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar en el panel..."
-          className="w-full rounded-input border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100"
+          className="w-full rounded-pill border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-accent-500 focus:bg-white focus:ring-2 focus:ring-accent-100"
         />
       </label>
 

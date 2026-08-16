@@ -17,7 +17,7 @@ export default async function ClientesAdminPage({
   const page = Number(pageParam) > 0 ? Number(pageParam) : 1;
   const skip = (page - 1) * PER_PAGE;
 
-  const [clientes, total] = await Promise.all([
+  const [rawClientes, total] = await Promise.all([
     prisma.cliente.findMany({
       orderBy: { createdAt: "desc" },
       skip,
@@ -31,6 +31,13 @@ export default async function ClientesAdminPage({
     prisma.cliente.count(),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+  // Prisma.Decimal no es serializable de servidor -> cliente: se convierte
+  // a number antes de pasarlo al componente cliente.
+  const clientes = rawClientes.map((c) => ({
+    ...c,
+    pedidos: c.pedidos.map((p) => ({ ...p, total: Number(p.total) })),
+  }));
 
   return (
     <ClientesPanel

@@ -36,12 +36,13 @@ export function CardHeader({
 }) {
   return (
     <div className="mb-4 flex items-start justify-between gap-4">
-      <div>
+      <div className="min-w-0">
         <h3 className="font-display text-base font-semibold text-gray-900">
           {title}
         </h3>
+        <div className="mt-2 h-0.5 w-10 rounded-pill bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500" />
         {description && (
-          <p className="mt-0.5 text-sm text-gray-500">{description}</p>
+          <p className="mt-2 text-sm text-gray-500">{description}</p>
         )}
       </div>
       {action}

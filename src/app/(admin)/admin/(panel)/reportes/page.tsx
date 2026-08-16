@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { BarChart3, TrendingUp, ShoppingBag, MapPin, DollarSign, Package } from "lucide-react";
+import { BarChart3, TrendingUp, ShoppingBag, DollarSign, Package } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
-import { Badge } from "@/src/frontend/components/ui/Badge";
+import { Badge, type BadgeVariant } from "@/src/frontend/components/ui/Badge";
+import { StatCard } from "@/src/frontend/components/ui/StatCard";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { prisma } from "@/src/backend/shared/prisma";
 
 export const metadata: Metadata = {
@@ -30,51 +32,54 @@ export default async function ReportesAdminPage() {
   const ventasTotales = Number(totalVentas._sum.total ?? 0);
   const ticketPromedio = Number(totalVentas._avg.total ?? 0);
 
+  const maxCantidad = Math.max(
+    ...productosMasVendidos.map((p) => Number(p._sum.cantidad ?? 0)),
+    1,
+  );
+
+  const ESTADO_COLOR: Record<string, BadgeVariant> = {
+    NUEVO: "info",
+    EN_REVISION: "warning",
+    EN_PRODUCCION: "primary",
+    EMPACADO: "warning",
+    ENVIADO: "info",
+    ENTREGADO: "success",
+    CANCELADO: "error",
+    DEVUELTO: "error",
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <BarChart3 className="size-6 text-primary-600" /> Reportes de Negocio
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Métricas clave de rendimiento, ventas acumuladas y análisis de catálogo.
-        </p>
-      </div>
+      <PageHeader
+        icon={BarChart3}
+        title="Reportes de Negocio"
+        description="Métricas clave de rendimiento, ventas acumuladas y análisis de catálogo."
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <TrendingUp className="size-6" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-500">Ventas Acumuladas</p>
-            <p className="font-display text-2xl font-bold text-gray-900">
-              ${ventasTotales.toLocaleString("es-CO")}
-            </p>
-          </div>
-        </Card>
+        <StatCard
+          label="Ventas Acumuladas"
+          value={`$${ventasTotales.toLocaleString("es-CO")}`}
+          hint="Total histórico"
+          icon={TrendingUp}
+          iconClass="bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600"
+        />
 
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-            <ShoppingBag className="size-6" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-500">Total de Pedidos</p>
-            <p className="font-display text-2xl font-bold text-gray-900">{totalPedidos}</p>
-          </div>
-        </Card>
+        <StatCard
+          label="Total de Pedidos"
+          value={totalPedidos}
+          hint="Pedidos registrados"
+          icon={ShoppingBag}
+          iconClass="bg-gradient-to-br from-primary-100 via-accent-50 to-secondary-100 text-primary-700"
+        />
 
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
-            <DollarSign className="size-6" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-500">Ticket Promedio</p>
-            <p className="font-display text-2xl font-bold text-gray-900">
-              ${Math.round(ticketPromedio).toLocaleString("es-CO")}
-            </p>
-          </div>
-        </Card>
+        <StatCard
+          label="Ticket Promedio"
+          value={`$${Math.round(ticketPromedio).toLocaleString("es-CO")}`}
+          hint="Valor medio por pedido"
+          icon={DollarSign}
+          iconClass="bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -86,20 +91,36 @@ export default async function ReportesAdminPage() {
             <p className="text-xs text-gray-400">Sin ventas registradas aún.</p>
           ) : (
             <ul className="space-y-3">
-              {productosMasVendidos.map((item, idx) => (
-                <li key={item.nombreProducto} className="flex items-center justify-between border-b border-gray-100 pb-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="flex size-6 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-primary-700">
-                      {idx + 1}
-                    </span>
-                    <span className="font-medium text-gray-900">{item.nombreProducto}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-bold text-gray-900">{item._sum.cantidad} unid.</span>
-                    <p className="text-[11px] text-gray-400">${Number(item._sum.subtotal ?? 0).toLocaleString("es-CO")}</p>
-                  </div>
-                </li>
-              ))}
+              {productosMasVendidos.map((item, idx) => {
+                const cantidad = Number(item._sum.cantidad ?? 0);
+                const pct = Math.round((cantidad / maxCantidad) * 100);
+                return (
+                  <li key={item.nombreProducto} className="border-b border-gray-100 pb-2 text-sm last:border-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 via-accent-50 to-secondary-100 text-xs font-bold text-primary-700">
+                          {idx + 1}
+                        </span>
+                        <span className="truncate font-medium text-gray-900">
+                          {item.nombreProducto}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-bold text-gray-900">{cantidad} unid.</span>
+                        <p className="text-[11px] text-gray-400">
+                          ${Number(item._sum.subtotal ?? 0).toLocaleString("es-CO")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-pill bg-gray-100">
+                      <div
+                        className="h-full rounded-pill bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </Card>
@@ -110,9 +131,14 @@ export default async function ReportesAdminPage() {
           </h3>
           <div className="space-y-2">
             {pedidosPorEstado.map((e) => (
-              <div key={e.estado} className="flex items-center justify-between rounded-lg bg-gray-50 p-2.5 text-xs">
+              <div
+                key={e.estado}
+                className="flex items-center justify-between rounded-input border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-2.5 text-xs"
+              >
                 <span className="font-bold text-gray-700">{e.estado}</span>
-                <Badge variant="info">{e._count.estado} pedidos</Badge>
+                <Badge variant={ESTADO_COLOR[e.estado] ?? "neutral"}>
+                  {e._count.estado} pedidos
+                </Badge>
               </div>
             ))}
           </div>

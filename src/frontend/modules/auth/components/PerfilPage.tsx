@@ -23,7 +23,8 @@ const initialPassword: PasswordFormState = { success: false };
 
 export function PerfilPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [perfilState, setPerfilState] = useState<PerfilFormState>(initialPerfil);
+  const [perfilState, setPerfilState] =
+    useState<PerfilFormState>(initialPerfil);
   const { toast } = useToast();
   const [updateState, updateAction, updatePending] = useActionState(
     actualizarPerfilAction,
@@ -50,7 +51,11 @@ export function PerfilPage() {
   useEffect(() => {
     if (updateState.success && updateState.message) {
       toast({ title: "Perfil actualizado", variant: "success" });
-      if (updateState.data) setPerfilState({ success: true, data: updateState.data });
+      // Actualiza el estado local con los datos devueltos por la Server Action.
+      if (updateState.data) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPerfilState({ success: true, data: updateState.data });
+      }
     } else if (updateState.error) {
       toast({
         title: "No se pudo guardar el perfil",
@@ -85,7 +90,9 @@ export function PerfilPage() {
   if (!d) {
     return (
       <Card>
-        <p className="text-sm text-error">{perfilState.error ?? "No se pudo cargar el perfil."}</p>
+        <p className="text-sm text-error">
+          {perfilState.error ?? "No se pudo cargar el perfil."}
+        </p>
       </Card>
     );
   }
@@ -96,7 +103,7 @@ export function PerfilPage() {
         <CardHeader
           title={
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 via-accent-50 to-secondary-100 text-primary-700 ring-1 ring-primary-100">
                 <UserIcon className="size-5" />
               </div>
               <span>Información del perfil</span>
@@ -169,7 +176,7 @@ export function PerfilPage() {
         <CardHeader
           title={
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600 ring-1 ring-violet-100">
                 <KeyRound className="size-5" />
               </div>
               <span>Cambiar contraseña</span>

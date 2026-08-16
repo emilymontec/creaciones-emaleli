@@ -4,17 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Wallet,
-  CreditCard,
   DollarSign,
-  Eye,
   ArrowUpRight,
-  FileCheck,
-  CheckCircle2,
+  CreditCard,
   TrendingDown,
+  Eye,
+  FileCheck,
+  CircleDollarSign,
+  Banknote,
+  BadgeCheck,
 } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { Table, type TableColumn } from "@/src/frontend/components/ui/Table";
 import { Badge } from "@/src/frontend/components/ui/Badge";
+import { StatCard } from "@/src/frontend/components/ui/StatCard";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import {
   obtenerPanelPagosAction,
   type PagosGeneralState,
@@ -150,132 +154,75 @@ export function PagosPanel() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Wallet className="size-6 text-primary-600" /> Control Financiero y Pagos
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Registro de anticipos, abonos, liquidaciones, facturación y control de saldos por cobrar.
-        </p>
-      </div>
+      <PageHeader
+        icon={Wallet}
+        title="Control Financiero y Pagos"
+        description="Registro de anticipos, abonos, liquidaciones, facturación y control de saldos por cobrar."
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <DollarSign className="size-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-gray-500">Total Facturado</p>
-            <p className="font-display text-2xl font-bold text-gray-900 tabular-nums truncate">
-              ${resumen.totalFacturado.toLocaleString("es-CO")}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {resumen.cantidadPedidos} pedidos
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-            <ArrowUpRight className="size-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-gray-500">Pagos Recibidos</p>
-            <p className="font-display text-2xl font-bold text-primary-700 tabular-nums truncate">
-              ${resumen.totalPagado.toLocaleString("es-CO")}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {pagos.length} movimientos
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-            <CreditCard className="size-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-gray-500">Saldo por Cobrar</p>
-            <p className="font-display text-2xl font-bold text-amber-800 tabular-nums truncate">
-              ${resumen.saldoPorCobrar.toLocaleString("es-CO")}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {resumen.totalFacturado > 0
-                ? `${((resumen.saldoPorCobrar / resumen.totalFacturado) * 100).toFixed(1)}% pendiente`
-                : "—"}
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-5 flex items-center gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
-            <TrendingDown className="size-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-gray-500">Cobro promedio / anticipo</p>
-            <p className="font-display text-2xl font-bold text-violet-800 tabular-nums truncate">
-              ${anticipos?.cantidad
-                ? Math.round((anticipos.monto) / anticipos.cantidad).toLocaleString("es-CO")
-                : "0"}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {anticipos?.cantidad ?? 0} anticipos registrados
-            </p>
-          </div>
-        </Card>
+        <StatCard
+          label="Total Facturado"
+          value={`$${resumen.totalFacturado.toLocaleString("es-CO")}`}
+          hint={`${resumen.cantidadPedidos} pedidos`}
+          icon={DollarSign}
+          iconClass="bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600"
+        />
+        <StatCard
+          label="Pagos Recibidos"
+          value={`$${resumen.totalPagado.toLocaleString("es-CO")}`}
+          hint={`${pagos.length} movimientos`}
+          icon={ArrowUpRight}
+          iconClass="bg-gradient-to-br from-primary-100 via-accent-50 to-secondary-100 text-primary-700"
+        />
+        <StatCard
+          label="Saldo por Cobrar"
+          value={`$${resumen.saldoPorCobrar.toLocaleString("es-CO")}`}
+          hint={
+            resumen.totalFacturado > 0
+              ? `${((resumen.saldoPorCobrar / resumen.totalFacturado) * 100).toFixed(1)}% pendiente`
+              : "—"
+          }
+          icon={CreditCard}
+          iconClass="bg-gradient-to-br from-amber-100 to-coral-100 text-amber-600"
+        />
+        <StatCard
+          label="Cobro promedio / anticipo"
+          value={
+            anticipos?.cantidad
+              ? Math.round(anticipos.monto / anticipos.cantidad).toLocaleString(
+                  "es-CO",
+                )
+              : "0"
+          }
+          hint={`${anticipos?.cantidad ?? 0} anticipos registrados`}
+          icon={TrendingDown}
+          iconClass="bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-4 border-l-4 border-l-sky-400">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
-                Anticipos
-              </p>
-              <p className="font-display text-xl font-bold text-gray-900 mt-1 tabular-nums">
-                ${(anticipos?.monto ?? 0).toLocaleString("es-CO")}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <CheckCircle2 className="size-4 text-sky-600" />
-              <Badge variant="info">{anticipos?.cantidad ?? 0}</Badge>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4 border-l-4 border-l-indigo-400">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
-                Abonos Parciales
-              </p>
-              <p className="font-display text-xl font-bold text-gray-900 mt-1 tabular-nums">
-                ${(abonos?.monto ?? 0).toLocaleString("es-CO")}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <CheckCircle2 className="size-4 text-indigo-600" />
-              <Badge variant="neutral">{abonos?.cantidad ?? 0}</Badge>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4 border-l-4 border-l-emerald-400">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                Pagos Finales / Cancelados
-              </p>
-              <p className="font-display text-xl font-bold text-gray-900 mt-1 tabular-nums">
-                ${(pagofinal?.monto ?? 0).toLocaleString("es-CO")}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <CheckCircle2 className="size-4 text-emerald-600" />
-              <Badge variant="success">{pagofinal?.cantidad ?? 0}</Badge>
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Anticipos"
+          value={`$${(anticipos?.monto ?? 0).toLocaleString("es-CO")}`}
+          hint={`${anticipos?.cantidad ?? 0} registrados`}
+          icon={CircleDollarSign}
+          iconClass="bg-gradient-to-br from-sky-100 to-primary-100 text-sky-600"
+        />
+        <StatCard
+          label="Abonos Parciales"
+          value={`$${(abonos?.monto ?? 0).toLocaleString("es-CO")}`}
+          hint={`${abonos?.cantidad ?? 0} registrados`}
+          icon={Banknote}
+          iconClass="bg-gradient-to-br from-indigo-100 to-primary-100 text-indigo-600"
+        />
+        <StatCard
+          label="Pagos Finales / Cancelados"
+          value={`$${(pagofinal?.monto ?? 0).toLocaleString("es-CO")}`}
+          hint={`${pagofinal?.cantidad ?? 0} registrados`}
+          icon={BadgeCheck}
+          iconClass="bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600"
+        />
       </div>
 
       <Card>
@@ -285,7 +232,8 @@ export function PagosPanel() {
               Historial General de Pagos
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">
-              Cada pago puede tener un comprobante adjunto y queda ligado al pedido y saldo pendiente.
+              Cada pago puede tener un comprobante adjunto y queda ligado al
+              pedido y saldo pendiente.
             </p>
           </div>
           <Badge variant="neutral">{pagos.length} registros</Badge>

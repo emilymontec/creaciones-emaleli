@@ -1,4 +1,5 @@
 import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
+import { Package } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { NewProductButton } from "@/src/frontend/modules/productos/components/NewProductButton";
 import { ProductsTable } from "@/src/frontend/modules/productos/components/ProductsTable";
@@ -38,6 +39,7 @@ export default async function ProductosPage({
   return (
     <div>
       <PageHeader
+        icon={Package}
         title="Productos"
         description="Administra el catálogo completo: precios, descripciones, SEO y categorías."
         action={<NewProductButton categoriaOptions={categoriaOptions} />}

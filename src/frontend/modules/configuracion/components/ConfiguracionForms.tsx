@@ -43,9 +43,16 @@ function EmpresaForm({ empresa }: { empresa: EmpresaConfigInput }) {
 
   useEffect(() => {
     if (state.success) {
-      toast({ title: state.message ?? "Configuración aplicada", variant: "success" });
+      toast({
+        title: state.message ?? "Configuración aplicada",
+        variant: "success",
+      });
     } else if (state.message) {
-      toast({ title: "No se pudo guardar", description: state.message, variant: "error" });
+      toast({
+        title: "No se pudo guardar",
+        description: state.message,
+        variant: "error",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -54,10 +61,14 @@ function EmpresaForm({ empresa }: { empresa: EmpresaConfigInput }) {
     <Card>
       <CardHeader
         title={
-          <div className="flex items-center gap-2">
-            <Store className="size-4 text-primary-600" /> Datos de la Empresa
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 via-accent-50 to-secondary-100 text-primary-700 ring-1 ring-primary-100">
+              <Store className="size-5" />
+            </div>
+            <span>Datos de la Empresa</span>
           </div>
         }
+        description="Nombre, correo, dirección y horario del negocio."
       />
       <form action={formAction} className="space-y-4">
         <Input
@@ -88,7 +99,8 @@ function EmpresaForm({ empresa }: { empresa: EmpresaConfigInput }) {
         />
         <div className="flex justify-end pt-2">
           <Button type="submit" disabled={pending}>
-            <Save className="size-4" /> {pending ? "Guardando..." : "Guardar Cambios"}
+            <Save className="size-4" />{" "}
+            {pending ? "Guardando..." : "Guardar Cambios"}
           </Button>
         </div>
       </form>
@@ -105,9 +117,16 @@ function ContactoForm({ contacto }: { contacto: ContactoConfigInput }) {
 
   useEffect(() => {
     if (state.success) {
-      toast({ title: state.message ?? "Configuración aplicada", variant: "success" });
+      toast({
+        title: state.message ?? "Configuración aplicada",
+        variant: "success",
+      });
     } else if (state.message) {
-      toast({ title: "No se pudo guardar", description: state.message, variant: "error" });
+      toast({
+        title: "No se pudo guardar",
+        description: state.message,
+        variant: "error",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -116,10 +135,14 @@ function ContactoForm({ contacto }: { contacto: ContactoConfigInput }) {
     <Card>
       <CardHeader
         title={
-          <div className="flex items-center gap-2">
-            <MessageCircle className="size-4 text-emerald-600" /> WhatsApp y Redes Sociales
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600 ring-1 ring-emerald-100">
+              <MessageCircle className="size-5" />
+            </div>
+            <span>WhatsApp y Redes Sociales</span>
           </div>
         }
+        description="Números de contacto y enlaces de redes del negocio."
       />
       <form action={formAction} className="space-y-4">
         <Input
@@ -150,7 +173,8 @@ function ContactoForm({ contacto }: { contacto: ContactoConfigInput }) {
         />
         <div className="flex justify-end pt-2">
           <Button type="submit" disabled={pending}>
-            <Save className="size-4" /> {pending ? "Guardando..." : "Guardar Cambios"}
+            <Save className="size-4" />{" "}
+            {pending ? "Guardando..." : "Guardar Cambios"}
           </Button>
         </div>
       </form>

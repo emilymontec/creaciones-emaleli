@@ -5,6 +5,8 @@ import { Truck, PackageCheck, MapPin, Eye, ExternalLink } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { Table, type TableColumn } from "@/src/frontend/components/ui/Table";
 import { Badge } from "@/src/frontend/components/ui/Badge";
+import { StatCard } from "@/src/frontend/components/ui/StatCard";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { EstadoPedidoBadge } from "@/src/frontend/modules/pedidos/components/EstadoPedidoBadge";
 
 type Envio = {
@@ -74,47 +76,31 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Truck className="size-6 text-primary-600" /> Logística y Envíos
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Control de despachos, guías de transportadoras y estados de entrega.
-        </p>
-      </div>
+      <PageHeader
+        icon={Truck}
+        title="Logística y Envíos"
+        description="Control de despachos, guías de transportadoras y estados de entrega."
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-4 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
-            <Truck className="size-5" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Guías Registradas</p>
-            <p className="font-display text-xl font-bold text-gray-900">
-              {envios.filter((e) => e.numeroGuia).length}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-4 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-            <MapPin className="size-5" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Pendientes de Guía</p>
-            <p className="font-display text-xl font-bold text-amber-800">
-              {envios.filter((e) => !e.numeroGuia && e.metodo === "TRANSPORTADORA").length}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-4 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <PackageCheck className="size-5" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium">Total Despachos</p>
-            <p className="font-display text-xl font-bold text-emerald-800">{envios.length}</p>
-          </div>
-        </Card>
+        <StatCard
+          label="Guías Registradas"
+          value={envios.filter((e) => e.numeroGuia).length}
+          icon={Truck}
+          iconClass="bg-gradient-to-br from-sky-100 to-primary-100 text-sky-600"
+        />
+        <StatCard
+          label="Pendientes de Guía"
+          value={envios.filter((e) => !e.numeroGuia && e.metodo === "TRANSPORTADORA").length}
+          icon={MapPin}
+          iconClass="bg-gradient-to-br from-amber-100 to-coral-100 text-amber-600"
+        />
+        <StatCard
+          label="Total Despachos"
+          value={envios.length}
+          icon={PackageCheck}
+          iconClass="bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600"
+        />
       </div>
 
       <Card>

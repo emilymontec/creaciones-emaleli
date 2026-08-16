@@ -17,6 +17,7 @@ import {
   List as ListIcon,
   type LucideIcon,
 } from "lucide-react";
+import clsx from "clsx";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { Input } from "@/src/frontend/components/ui/Input";
 import { Select } from "@/src/frontend/components/ui/Select";
@@ -24,6 +25,7 @@ import { Button } from "@/src/frontend/components/ui/Button";
 import { Table, type TableColumn } from "@/src/frontend/components/ui/Table";
 import { Pagination } from "@/src/frontend/components/ui/Pagination";
 import { Badge } from "@/src/frontend/components/ui/Badge";
+import { StatCard } from "@/src/frontend/components/ui/StatCard";
 import { EstadoPedidoBadge, estadoOptions } from "./EstadoPedidoBadge";
 import { PedidosKanbanView } from "./PedidosKanbanView";
 import { listarPedidosAction } from "@/src/backend/modules/pedidos/actions/managePedidos";
@@ -42,11 +44,36 @@ type PedidoRow = {
   _count: { items: number; pagos: number };
 };
 
-const METRICS_MAP: Record<string, { label: string; Icon: LucideIcon }> = {
-  NUEVO: { label: "Nuevos", Icon: Sparkles },
-  EN_PRODUCCION: { label: "En producción", Icon: FactoryIcon },
-  ENVIADO: { label: "Enviados", Icon: TruckIcon },
-  ENTREGADO: { label: "Entregados", Icon: PackageCheck },
+const METRICS_MAP: Record<
+  string,
+  { label: string; Icon: LucideIcon; hint: string; iconClass: string }
+> = {
+  NUEVO: {
+    label: "Nuevos",
+    Icon: Sparkles,
+    hint: "En cola de atención",
+    iconClass: "bg-gradient-to-br from-coral-100 to-accent-100 text-coral-600",
+  },
+  EN_PRODUCCION: {
+    label: "En producción",
+    Icon: FactoryIcon,
+    hint: "En el taller",
+    iconClass:
+      "bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600",
+  },
+  ENVIADO: {
+    label: "Enviados",
+    Icon: TruckIcon,
+    hint: "En tránsito",
+    iconClass: "bg-gradient-to-br from-sky-100 to-primary-100 text-sky-600",
+  },
+  ENTREGADO: {
+    label: "Entregados",
+    Icon: PackageCheck,
+    hint: "Completados",
+    iconClass:
+      "bg-gradient-to-br from-emerald-100 to-secondary-100 text-emerald-600",
+  },
 };
 
 export function PedidosListPage() {
@@ -56,7 +83,6 @@ export function PedidosListPage() {
   const [list, setList] = useState<ListadoPedidosState>({ success: false });
   const [vistaMode, setVistaMode] = useState<"tabla" | "kanban">("tabla");
   const loading = isPending || !list.success;
-
 
   const filters = useMemo(
     () => ({
@@ -84,7 +110,14 @@ export function PedidosListPage() {
     });
   }
 
-  useEffect(cargarDatos, [filters.estado, filters.ciudad, filters.cliente, filters.fechaDesde, filters.fechaHasta, filters.page]);
+  useEffect(cargarDatos, [
+    filters.estado,
+    filters.ciudad,
+    filters.cliente,
+    filters.fechaDesde,
+    filters.fechaHasta,
+    filters.page,
+  ]);
 
   function submitFilters(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -141,7 +174,9 @@ export function PedidosListPage() {
       sortValue: (r) => r.cliente?.nombre ?? "",
       render: (r) => (
         <div>
-          <p className="font-medium text-gray-800">{r.cliente?.nombre ?? "—"}</p>
+          <p className="font-medium text-gray-800">
+            {r.cliente?.nombre ?? "—"}
+          </p>
           <p className="text-xs text-gray-500">{r.cliente?.whatsapp ?? ""}</p>
         </div>
       ),
@@ -190,19 +225,18 @@ export function PedidosListPage() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Object.entries(METRICS_MAP).map(([estado, { label, Icon }]) => (
-          <Card key={estado} className="flex items-center gap-3 p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-              <Icon className="size-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500">{label}</p>
-              <p className="font-display text-xl font-bold text-gray-900">
-                {conteos[estado] ?? 0}
-              </p>
-            </div>
-          </Card>
-        ))}
+        {Object.entries(METRICS_MAP).map(
+          ([estado, { label, Icon, hint, iconClass }]) => (
+            <StatCard
+              key={estado}
+              label={label}
+              value={conteos[estado] ?? 0}
+              hint={hint}
+              icon={Icon}
+              iconClass={iconClass}
+            />
+          ),
+        )}
       </div>
 
       <Card>
@@ -277,15 +311,16 @@ export function PedidosListPage() {
             <Badge variant="neutral">{total} en total</Badge>
           </div>
 
-          <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs">
+          <div className="flex items-center gap-1 rounded-pill border border-gray-100 bg-white p-1 text-xs shadow-card">
             <button
               type="button"
               onClick={() => setVistaMode("tabla")}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
+              className={clsx(
+                "flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-semibold transition-all",
                 vistaMode === "tabla"
-                  ? "bg-white text-primary-600 shadow-xs"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
+                  ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-card"
+                  : "text-gray-500 hover:bg-primary-50 hover:text-primary-700",
+              )}
             >
               <ListIcon className="size-3.5" />
               Tabla
@@ -293,11 +328,12 @@ export function PedidosListPage() {
             <button
               type="button"
               onClick={() => setVistaMode("kanban")}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors ${
+              className={clsx(
+                "flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-semibold transition-all",
                 vistaMode === "kanban"
-                  ? "bg-white text-primary-600 shadow-xs"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
+                  ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-card"
+                  : "text-gray-500 hover:bg-primary-50 hover:text-primary-700",
+              )}
             >
               <LayoutGrid className="size-3.5" />
               Kanban

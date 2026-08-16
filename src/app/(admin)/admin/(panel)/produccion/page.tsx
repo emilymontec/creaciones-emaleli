@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Factory, Clock, CheckCircle2, Eye, AlertCircle } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
-import { Badge } from "@/src/frontend/components/ui/Badge";
+import { StatCard } from "@/src/frontend/components/ui/StatCard";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { EstadoPedidoBadge } from "@/src/frontend/modules/pedidos/components/EstadoPedidoBadge";
 import { prisma } from "@/src/backend/shared/prisma";
 
@@ -27,34 +28,34 @@ export default async function ProduccionAdminPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Factory className="size-6 text-primary-600" /> Control de Producción y Taller
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Seguimiento de pedidos activos en etapa de diseño, aprobación y fabricación.
-        </p>
-      </div>
+      <PageHeader
+        icon={Factory}
+        title="Control de Producción y Taller"
+        description="Seguimiento de pedidos activos en etapa de diseño, aprobación y fabricación."
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-4 border-l-4 border-amber-500">
-          <p className="text-xs font-semibold text-gray-500 uppercase">En Revisión / Diseño</p>
-          <p className="font-display text-2xl font-bold text-gray-900 mt-1">
-            {pedidosProduccion.filter((p) => p.estado === "EN_REVISION").length}
-          </p>
-        </Card>
-        <Card className="p-4 border-l-4 border-sky-500">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Diseño Aprobado</p>
-          <p className="font-display text-2xl font-bold text-gray-900 mt-1">
-            {pedidosProduccion.filter((p) => p.estado === "DISENO_APROBADO").length}
-          </p>
-        </Card>
-        <Card className="p-4 border-l-4 border-purple-500">
-          <p className="text-xs font-semibold text-gray-500 uppercase">En Fabricación</p>
-          <p className="font-display text-2xl font-bold text-gray-900 mt-1">
-            {pedidosProduccion.filter((p) => p.estado === "EN_PRODUCCION").length}
-          </p>
-        </Card>
+        <StatCard
+          label="En Revisión / Diseño"
+          value={pedidosProduccion.filter((p) => p.estado === "EN_REVISION").length}
+          hint="Esperando visto bueno"
+          icon={AlertCircle}
+          iconClass="bg-gradient-to-br from-coral-100 to-accent-100 text-coral-600"
+        />
+        <StatCard
+          label="Diseño Aprobado"
+          value={pedidosProduccion.filter((p) => p.estado === "DISENO_APROBADO").length}
+          hint="Listos para fabricar"
+          icon={Clock}
+          iconClass="bg-gradient-to-br from-sky-100 to-primary-100 text-sky-600"
+        />
+        <StatCard
+          label="En Fabricación"
+          value={pedidosProduccion.filter((p) => p.estado === "EN_PRODUCCION").length}
+          hint="En el taller"
+          icon={Factory}
+          iconClass="bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600"
+        />
       </div>
 
       <Card>

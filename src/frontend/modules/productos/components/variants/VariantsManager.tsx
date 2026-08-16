@@ -364,12 +364,12 @@ function CombinacionesEditor({
         <div className="mt-6 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-gray-500">
-                <th className="py-2 pr-3 font-semibold">Combinación</th>
-                <th className="py-2 pr-3 font-semibold">SKU</th>
-                <th className="py-2 pr-3 font-semibold">Precio</th>
-                <th className="py-2 pr-3 font-semibold">Stock</th>
-                <th className="py-2 pr-3 font-semibold">Activa</th>
+              <tr className="border-b border-gray-100 bg-gradient-to-br from-gray-50/80 to-white text-gray-500">
+                <th className="py-2 pr-3 text-[11px] font-bold uppercase tracking-wider">Combinación</th>
+                <th className="py-2 pr-3 text-[11px] font-bold uppercase tracking-wider">SKU</th>
+                <th className="py-2 pr-3 text-[11px] font-bold uppercase tracking-wider">Precio</th>
+                <th className="py-2 pr-3 text-[11px] font-bold uppercase tracking-wider">Stock</th>
+                <th className="py-2 pr-3 text-[11px] font-bold uppercase tracking-wider">Activa</th>
                 <th />
               </tr>
             </thead>

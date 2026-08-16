@@ -24,6 +24,7 @@ import {
   FileCheck,
   AlertTriangle,
   Receipt,
+  type LucideIcon,
 } from "lucide-react";
 import { Card, CardHeader } from "@/src/frontend/components/ui/Card";
 import { Input } from "@/src/frontend/components/ui/Input";
@@ -61,7 +62,7 @@ import { useToast } from "@/src/frontend/providers/ToastProvider";
 import type { EstadoPedido, TipoEventoTimeline } from "@/generated/prisma/client";
 import { ProduccionSection } from "./ProduccionSection";
 
-const TIPO_ICON: Record<string, any> = {
+const TIPO_ICON: Record<string, LucideIcon> = {
   CREACION_PEDIDO: Package,
   CAMBIO_ESTADO: CheckCircle2,
   PAGO_REGISTRADO: CreditCard,
@@ -133,7 +134,6 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pedidoId]);
 
   useEffect(() => {
@@ -157,6 +157,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
   useEffect(() => {
     if (comentState.success) {
       toast({ title: comentState.message ?? "Comentario agregado", variant: "success" });
+      // Limpia el campo local al reaccionar al resultado de la Server Action.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setComentario("");
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
@@ -175,6 +177,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
   useEffect(() => {
     if (pagoState.success) {
       toast({ title: pagoState.message ?? "Pago registrado", variant: "success" });
+      // Cierra el modal y limpia la vista previa al reaccionar al resultado.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPagoModalOpen(false);
       setComprobantePreview(null);
       startTransition(async () => {
@@ -193,6 +197,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
         title: facturaState.message ?? "Factura actualizada",
         variant: "success",
       });
+      // Cierra el modal y limpia la vista previa al reaccionar al resultado.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFacturaModalOpen(false);
       setFacturaPdfPreview(null);
       startTransition(async () => {
@@ -212,6 +218,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
   useEffect(() => {
     if (envioState.success) {
       toast({ title: envioState.message ?? "Guía de envío guardada", variant: "success" });
+      // Cierra el modal al reaccionar al resultado de la Server Action.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEnvioModalOpen(false);
       startTransition(async () => {
         const res = await obtenerDetallePedidoAction(pedidoId);
@@ -299,6 +307,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             {totalItems} {totalItems === 1 ? "producto" : "productos"} · Método de
             envío: {p.metodoEnvio}
           </p>
+          <div className="mt-3 h-1 w-14 rounded-pill bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500" />
         </div>
 
         <Card className="w-full max-w-md">
@@ -423,7 +432,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {p.items.map((it: any) => (
+                  {p.items.map((it) => (
                     <tr
                       key={it.id}
                       className="border-t border-gray-50 align-top"
@@ -435,7 +444,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                         {it.personalizaciones && (
                           <ul className="mt-1 space-y-0.5 text-xs text-gray-500">
                             {Object.entries(
-                              it.personalizaciones as Record<string, any>,
+                              it.personalizaciones as Record<string, unknown>,
                             ).map(([k, v]) => (
                               <li key={k}>
                                 <span className="font-medium">{k}:</span>{" "}
@@ -530,7 +539,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
               </p>
             ) : (
               <ul className="space-y-2">
-                {p.pagos.map((pago: any) => (
+                {p.pagos.map((pago) => (
                   <li
                     key={pago.id}
                     className="rounded-input border border-gray-100 bg-gray-50/50 px-3 py-2"
@@ -539,7 +548,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-gray-900">
-                            {TIPO_PAGO_LABEL[pago.tipo] ?? pago.tipo}
+                            {TIPO_PAGO_LABEL[pago.tipo as keyof typeof TIPO_PAGO_LABEL] ?? pago.tipo}
                             <span className="ml-2 text-xs font-normal text-gray-500">
                               · {pago.metodo}
                             </span>
@@ -675,7 +684,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 }
               />
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {p.archivos.map((a: any) => (
+                {p.archivos.map((a) => (
                   <a
                     key={a.id}
                     href={a.url}
@@ -818,7 +827,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
               {p.timeline.length === 0 && (
                 <p className="text-sm text-gray-500">Sin eventos todavía.</p>
               )}
-              {p.timeline.map((ev: any) => {
+              {p.timeline.map((ev) => {
                 const Icono = TIPO_ICON[ev.tipo as TipoEventoTimeline] ?? Clock;
                 return (
                   <li key={ev.id} className="relative">

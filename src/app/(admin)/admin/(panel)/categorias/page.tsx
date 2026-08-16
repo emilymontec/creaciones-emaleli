@@ -1,4 +1,5 @@
 import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
+import { Tag } from "lucide-react";
 import { Card } from "@/src/frontend/components/ui/Card";
 import { NewCategoryButton } from "@/src/frontend/modules/categorias/components/NewCategoryButton";
 import { CategoriasTable } from "@/src/frontend/modules/categorias/components/CategoriasTable";
@@ -10,6 +11,7 @@ export default async function CategoriasPage() {
   return (
     <div>
       <PageHeader
+        icon={Tag}
         title="Categorías"
         description="Organiza el catálogo de la tienda en categorías. Arrastra las filas para reordenarlas."
         action={<NewCategoryButton />}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Settings } from "lucide-react";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { ConfiguracionForms } from "@/src/frontend/modules/configuracion/components/ConfiguracionForms";
 import {
   obtenerConfigEmpresa,
@@ -18,14 +19,11 @@ export default async function ConfiguracionAdminPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Settings className="size-6 text-primary-600" /> Configuración de la Tienda
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Administra la información general del negocio, números de WhatsApp y parámetros del sitio.
-        </p>
-      </div>
+      <PageHeader
+        icon={Settings}
+        title="Configuración de la Tienda"
+        description="Administra la información general del negocio, números de WhatsApp y parámetros del sitio."
+      />
 
       <ConfiguracionForms empresa={empresa} contacto={contacto} />
     </div>

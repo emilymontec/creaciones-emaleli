@@ -100,7 +100,7 @@ export function Table<T>({
     <div className="overflow-x-auto rounded-card border border-gray-100 shadow-card">
       <table className="w-full min-w-max border-collapse text-left text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/70">
+          <tr className="border-b border-gray-100 bg-gradient-to-br from-gray-50/80 to-white">
             {selectable && (
               <th className="w-10 px-4 py-3">
                 <Checkbox
@@ -116,7 +116,7 @@ export function Table<T>({
               <th
                 key={column.key}
                 className={clsx(
-                  "px-4 py-3 font-semibold text-gray-500",
+                  "px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500",
                   column.sortable && "cursor-pointer select-none",
                   column.className,
                 )}

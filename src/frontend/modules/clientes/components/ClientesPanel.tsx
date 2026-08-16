@@ -5,6 +5,7 @@ import { Card } from "@/src/frontend/components/ui/Card";
 import { Table, type TableColumn } from "@/src/frontend/components/ui/Table";
 import { Badge } from "@/src/frontend/components/ui/Badge";
 import { AdminListPagination } from "@/src/frontend/components/shared/AdminListPagination";
+import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 
 type Cliente = {
   id: string;
@@ -82,14 +83,11 @@ export function ClientesPanel({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Users className="size-6 text-primary-600" /> Directorio de Clientes
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Base de datos de clientes registrados desde la tienda y el checkout.
-        </p>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="Directorio de Clientes"
+        description="Base de datos de clientes registrados desde la tienda y el checkout."
+      />
 
       <Card>
         <div className="mb-4 flex items-center justify-between">

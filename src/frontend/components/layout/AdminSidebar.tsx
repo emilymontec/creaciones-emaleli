@@ -27,6 +27,12 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const initials = userName
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   useEffect(() => {
     if (variant !== "desktop") return;
@@ -50,31 +56,40 @@ export function AdminSidebar({
   return (
     <aside
       className={clsx(
-        "flex h-full flex-col border-r border-gray-100 bg-white transition-[width] duration-200",
+        "relative flex h-full flex-col border-r border-gray-100 bg-white transition-[width] duration-200",
         variant === "desktop" && (isCollapsed ? "w-[76px]" : "w-64"),
+        variant === "desktop" && "lg:sticky lg:top-0 lg:h-screen",
         variant === "mobile" && "w-full",
       )}
     >
+      {/* Línea de acento de marca */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-marquee-gradient"
+        aria-hidden
+      />
+
       <div
         className={clsx(
-          "flex items-center gap-3 border-b border-gray-100 px-4 py-5",
+          "flex items-center gap-3 px-4 pb-4 pt-6",
           isCollapsed && "justify-center px-2",
         )}
       >
-        <Image
-          src="/brand/logo-emaleli.png"
-          alt="Creaciones Emaleli"
-          width={36}
-          height={36}
-          className="shrink-0 rounded-lg"
-        />
+        <div className="relative shrink-0 rounded-xl bg-gradient-to-br from-accent-100 via-primary-100 to-secondary-100 p-[2px]">
+          <Image
+            src="/brand/logo-emaleli.png"
+            alt="Creaciones Emaleli"
+            width={34}
+            height={34}
+            className="rounded-[10px] bg-white"
+          />
+        </div>
         {!isCollapsed && (
           <div className="min-w-0">
-            <p className="truncate font-display text-sm font-bold leading-tight text-gray-900">
-              CREACIONES
+            <p className="truncate text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+              Creaciones
             </p>
-            <p className="truncate font-display text-base font-bold leading-tight text-primary-600">
-              creaciones emaleli
+            <p className="truncate bg-gradient-to-r from-accent-600 via-primary-600 to-secondary-600 bg-clip-text font-display text-base font-bold leading-tight text-transparent">
+              Emaleli
             </p>
           </div>
         )}
@@ -102,14 +117,27 @@ export function AdminSidebar({
                     href={item.href}
                     title={isCollapsed ? item.label : undefined}
                     className={clsx(
-                      "flex items-center gap-3 rounded-input px-3 py-2.5 text-sm font-semibold transition-colors",
+                      "group relative flex items-center gap-3 rounded-input px-3 py-2.5 text-sm font-semibold transition-colors",
                       isCollapsed && "justify-center px-0",
                       active
                         ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-card"
                         : "text-gray-500 hover:bg-primary-50 hover:text-primary-700",
                     )}
                   >
-                    <Icon className="size-[18px] shrink-0" />
+                    {active && (
+                      <span
+                        className="absolute -left-1 top-1/2 hidden h-5 w-1 -translate-y-1/2 rounded-pill bg-accent-500 lg:block"
+                        aria-hidden
+                      />
+                    )}
+                    <Icon
+                      className={clsx(
+                        "size-[18px] shrink-0",
+                        active
+                          ? "text-white"
+                          : "text-gray-400 group-hover:text-primary-600",
+                      )}
+                    />
                     {!isCollapsed && (
                       <span className="truncate">{item.label}</span>
                     )}
@@ -143,11 +171,16 @@ export function AdminSidebar({
         )}
 
         {!isCollapsed && (
-          <div className="mb-2 truncate rounded-input bg-gray-50 px-3 py-2">
-            <p className="truncate text-sm font-semibold text-gray-800">
-              {userName}
-            </p>
-            <p className="truncate text-xs text-gray-400">{userEmail}</p>
+          <div className="mb-2 flex items-center gap-2.5 rounded-input border border-gray-100 bg-gradient-to-br from-primary-50/60 via-white to-secondary-50/60 px-3 py-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-primary-600 text-xs font-bold text-white shadow-card">
+              {initials || "AD"}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-gray-800">
+                {userName}
+              </p>
+              <p className="truncate text-xs text-gray-400">{userEmail}</p>
+            </div>
           </div>
         )}
 
@@ -156,7 +189,7 @@ export function AdminSidebar({
             type="submit"
             title={isCollapsed ? "Cerrar sesión" : undefined}
             className={clsx(
-              "flex w-full items-center gap-2 rounded-input bg-gray-100 px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200",
+              "flex w-full items-center gap-2 rounded-input bg-gradient-to-br from-coral-100/70 to-accent-100/70 px-3 py-2.5 text-sm font-medium text-coral-700 transition-colors hover:from-coral-100 hover:to-accent-100",
               isCollapsed && "justify-center px-0",
             )}
           >

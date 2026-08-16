@@ -91,6 +91,14 @@ export async function registrarPagoConComprobante(params: {
 
     const nuevoSaldo = Math.max(0, montoTotal - nuevoTotalPagado);
 
+    let comprobanteId: string | null | undefined;
+    if (params.comprobante) {
+      const adjunto = await tx.archivoAdjunto.create({
+        data: params.comprobante,
+      });
+      comprobanteId = adjunto.id;
+    }
+
     const pago = await tx.pago.create({
       data: {
         pedidoId: params.pedidoId,
@@ -100,9 +108,7 @@ export async function registrarPagoConComprobante(params: {
         notas: params.notas ?? null,
         fecha: params.fecha ?? new Date(),
         usuarioId: params.usuarioId ?? null,
-        comprobante: params.comprobante
-          ? { create: params.comprobante }
-          : undefined,
+        comprobanteId,
       },
       include: {
         comprobante: true,

@@ -39,11 +39,8 @@ export type PagosGeneralState = {
   pagos?: Awaited<ReturnType<typeof listarHistorialPagos>>;
 };
 
-const initialPago: PagoActionState = { success: false };
-const initialFactura: FacturaActionState = { success: false };
-
 export async function registrarPagoConComprobanteAction(
-  prevState: PagoActionState = initialPago,
+  _prevState: PagoActionState,
   formData: FormData,
 ): Promise<PagoActionState> {
   const user = await getSessionUser();
@@ -91,6 +88,9 @@ export async function obtenerFacturaPedidoAction(
   if (!user) redirect("/admin/login");
   try {
     const factura = await obtenerFacturaPedido(pedidoId);
+    if (!factura) {
+      return { success: false, error: "Este pedido aún no tiene una factura registrada." };
+    }
     return { success: true, factura };
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
@@ -99,7 +99,7 @@ export async function obtenerFacturaPedidoAction(
 }
 
 export async function gestionarFacturaAction(
-  prevState: FacturaActionState = initialFactura,
+  _prevState: FacturaActionState,
   formData: FormData,
 ): Promise<FacturaActionState> {
   const user = await getSessionUser();
