@@ -28,7 +28,10 @@ export function LoginForm() {
       </div>
 
       {state.message && (
-        <p className="rounded-input bg-error-light p-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="rounded-input bg-error-light p-3 text-sm text-red-700"
+        >
           {state.message}
         </p>
       )}

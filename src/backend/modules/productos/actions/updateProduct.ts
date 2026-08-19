@@ -10,11 +10,15 @@ import {
   uploadCatalogImage,
 } from "@/src/backend/shared/uploadEntityImage";
 import type { ProductFormState } from "./createProduct";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export async function updateProductAction(
   prevState: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const id = formData.get("id") as string;
   const seoImagenFile = getOptionalFile(formData, "seoImagenArchivo");
   const seoImagenActual =

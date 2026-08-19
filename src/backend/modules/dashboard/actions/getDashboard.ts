@@ -1,16 +1,19 @@
 "use server";
 
 import { prisma } from "@/src/backend/shared/prisma";
-import { Prisma } from "@/generated/prisma/client";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export async function obtenerDashboardMetricas() {
+  await requireAdmin(PERMISOS.REPORTES_VER);
+
   const [nuevos, productos, categorias, saldoRaw] = await Promise.all([
     prisma.pedido.count({ where: { estado: "NUEVO" } }),
     prisma.producto.count({ where: { estado: "ACTIVO" } }),
     prisma.categoria.count({ where: { activo: true } }),
     prisma.pedido.aggregate({
       where: {
-        estado: { notIn: ["ENTREGADO", "CANCELADO"] as any[] },
+        estado: { notIn: ["ENTREGADO", "CANCELADO"] },
       },
       _sum: { saldoPendiente: true },
     }),

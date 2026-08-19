@@ -1,5 +1,5 @@
 import { prisma } from "@/src/backend/shared/prisma";
-import { Prisma } from "@/generated/prisma/client";
+import { Prisma, type EstadoPedido } from "@/generated/prisma/client";
 
 export async function crearCliente(data: Prisma.ClienteCreateInput) {
   return prisma.cliente.create({ data });
@@ -58,7 +58,7 @@ export async function crearPedidoTransaccion(payload: {
         timeline: {
           create: {
             tipo: "CREACION_PEDIDO",
-            estadoNuevo: payload.pedido.estado as any,
+            estadoNuevo: payload.pedido.estado as EstadoPedido,
             descripcion: "Pedido creado desde checkout.",
           },
         },
@@ -119,7 +119,7 @@ export async function buscarPedidoPorToken(token: string) {
 }
 
 export interface ListarPedidosFiltros {
-  estado?: string;
+  estado?: EstadoPedido;
   ciudad?: string;
   cliente?: string;
   fechaDesde?: Date;
@@ -134,8 +134,9 @@ export async function listarPedidosAdmin(filtros: ListarPedidosFiltros = {}) {
   const skip = (page - 1) * perPage;
 
   const where: Prisma.PedidoWhereInput = {};
-  if (filtros.estado) where.estado = filtros.estado as any;
-  if (filtros.ciudad) where.ciudad = { contains: filtros.ciudad, mode: "insensitive" };
+  if (filtros.estado) where.estado = filtros.estado;
+  if (filtros.ciudad)
+    where.ciudad = { contains: filtros.ciudad, mode: "insensitive" };
   if (filtros.cliente) {
     where.cliente = {
       OR: [
@@ -158,7 +159,9 @@ export async function listarPedidosAdmin(filtros: ListarPedidosFiltros = {}) {
       take: perPage,
       orderBy: { fechaPedido: "desc" },
       include: {
-        cliente: { select: { id: true, nombre: true, whatsapp: true, ciudad: true } },
+        cliente: {
+          select: { id: true, nombre: true, whatsapp: true, ciudad: true },
+        },
         _count: { select: { items: true, pagos: true } },
         pagos: { select: { monto: true, tipo: true, fecha: true } },
       },
@@ -238,8 +241,8 @@ export async function obtenerPedidoDetallePorCodigo(codigo: string) {
 
 export async function actualizarEstadoPedido(params: {
   id: string;
-  estadoNuevo: any;
-  estadoAnterior: any;
+  estadoNuevo: EstadoPedido;
+  estadoAnterior: EstadoPedido;
   usuarioId: string;
   descripcion?: string;
 }) {
@@ -288,7 +291,13 @@ export async function buscarPedidoPorTokenPublico(token: string) {
       items: true,
       pagos: {
         orderBy: { fecha: "desc" },
-        select: { id: true, tipo: true, monto: true, fecha: true, metodo: true },
+        select: {
+          id: true,
+          tipo: true,
+          monto: true,
+          fecha: true,
+          metodo: true,
+        },
       },
       envios: true,
       archivos: true,
@@ -340,7 +349,13 @@ export async function buscarPedidoPorTokenPublico(token: string) {
       },
       timeline: {
         orderBy: { createdAt: "desc" },
-        select: { id: true, tipo: true, estadoNuevo: true, descripcion: true, createdAt: true },
+        select: {
+          id: true,
+          tipo: true,
+          estadoNuevo: true,
+          descripcion: true,
+          createdAt: true,
+        },
       },
     },
   });
@@ -354,10 +369,15 @@ export async function registrarPagoTransaccion(params: {
   usuarioId?: string;
 }) {
   return prisma.$transaction(async (tx) => {
-    const pedido = await tx.pedido.findUnique({ where: { id: params.pedidoId } });
+    const pedido = await tx.pedido.findUnique({
+      where: { id: params.pedidoId },
+    });
     if (!pedido) throw new Error("Pedido no encontrado.");
 
-    const nuevoSaldo = Math.max(0, Number(pedido.saldoPendiente) - params.monto);
+    const nuevoSaldo = Math.max(
+      0,
+      Number(pedido.saldoPendiente) - params.monto,
+    );
 
     const pago = await tx.pago.create({
       data: {
@@ -399,15 +419,29 @@ export async function actualizarEnvioTransaccion(params: {
       where: { pedidoId: params.pedidoId },
     });
 
+    const estadoGuia = params.estadoGuia || "GENERADA";
+
+    // fechaDespacho se registra una sola vez, la primera vez que se
+    // guarda una guía para el pedido — no debe reescribirse en
+    // actualizaciones posteriores de estado (p. ej. al marcar ENTREGADA).
+    // fechaEntrega solo se registra cuando el estado pasa a ENTREGADA por
+    // primera vez.
+    const fechaDespacho = envioExistente?.fechaDespacho ?? new Date();
+    const fechaEntrega =
+      estadoGuia === "ENTREGADA"
+        ? (envioExistente?.fechaEntrega ?? new Date())
+        : (envioExistente?.fechaEntrega ?? null);
+
     let envio;
     if (envioExistente) {
       envio = await tx.envio.update({
         where: { id: envioExistente.id },
         data: {
           numeroGuia: params.numeroGuia,
-          estadoGuia: params.estadoGuia || "GENERADA",
+          estadoGuia,
           enlaceRastreo: params.enlaceRastreo || null,
-          fechaDespacho: new Date(),
+          fechaDespacho,
+          fechaEntrega,
         },
       });
     } else {
@@ -416,9 +450,10 @@ export async function actualizarEnvioTransaccion(params: {
           pedidoId: params.pedidoId,
           metodo: "TRANSPORTADORA",
           numeroGuia: params.numeroGuia,
-          estadoGuia: params.estadoGuia || "GENERADA",
+          estadoGuia,
           enlaceRastreo: params.enlaceRastreo || null,
-          fechaDespacho: new Date(),
+          fechaDespacho,
+          fechaEntrega,
         },
       });
     }
@@ -428,7 +463,10 @@ export async function actualizarEnvioTransaccion(params: {
         pedidoId: params.pedidoId,
         tipo: "ENVIO_GENERADO",
         usuarioId: params.usuarioId || null,
-        descripcion: `Guía de envío ${params.numeroGuia} registrada.`,
+        descripcion:
+          estadoGuia === "ENTREGADA"
+            ? `Pedido marcado como entregado (guía ${params.numeroGuia}).`
+            : `Guía de envío ${params.numeroGuia} registrada (${estadoGuia}).`,
       },
     });
 
@@ -446,3 +484,21 @@ export async function listarCiudadesPedido() {
   return rows.map((r) => r.ciudad).filter(Boolean) as string[];
 }
 
+export async function listarEnvios(limit = 50) {
+  return prisma.envio.findMany({
+    take: limit,
+    orderBy: { id: "desc" },
+    include: {
+      pedido: {
+        select: {
+          id: true,
+          codigo: true,
+          estado: true,
+          ciudad: true,
+          direccion: true,
+          cliente: { select: { nombre: true, whatsapp: true } },
+        },
+      },
+    },
+  });
+}

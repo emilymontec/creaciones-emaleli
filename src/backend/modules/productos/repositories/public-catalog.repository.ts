@@ -115,3 +115,11 @@ export async function findRelated(
     take: limit,
   });
 }
+
+/** Slugs y fecha de actualización de todos los productos visibles públicamente, para sitemap.xml. */
+export async function findAllActiveSlugs() {
+  return prisma.producto.findMany({
+    where: { estado: { in: ["ACTIVO", "AGOTADO"] } },
+    select: { slug: true, updatedAt: true },
+  });
+}

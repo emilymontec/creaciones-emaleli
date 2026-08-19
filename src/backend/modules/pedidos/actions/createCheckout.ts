@@ -1,11 +1,28 @@
 "use server";
 
+import { headers } from "next/headers";
 import { CheckoutSchema } from "../schemas/checkout.schema";
 import {
   crearPedido,
   construirMensajeWhatsapp,
 } from "../services/pedido.service";
+import { obtenerConfigContacto } from "@/src/backend/modules/configuracion/services/configuracion.service";
 import { toErrorMessage } from "@/src/shared/lib/errors";
+import { checkRateLimit } from "@/src/backend/shared/rate-limit";
+
+const CHECKOUT_MAX_INTENTOS = 10;
+const CHECKOUT_VENTANA_MS = 10 * 60 * 1000; // 10 minutos
+const DEFAULT_WHATSAPP =
+  process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
+
+async function obtenerIpCliente(): Promise<string> {
+  const h = await headers();
+  return (
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    h.get("x-real-ip") ||
+    "desconocida"
+  );
+}
 
 export type CheckoutActionState = {
   success: boolean;
@@ -14,6 +31,7 @@ export type CheckoutActionState = {
   pedidoCodigo?: string;
   pedidoToken?: string;
   whatsappMessage?: string;
+  whatsappNumber?: string;
   clienteNombre?: string;
   clienteWhatsapp?: string;
 };
@@ -54,6 +72,21 @@ export async function createCheckoutAction(
   formData: FormData,
 ): Promise<CheckoutActionState> {
   try {
+    const ip = await obtenerIpCliente();
+    const rate = checkRateLimit(
+      `checkout:${ip}`,
+      CHECKOUT_MAX_INTENTOS,
+      CHECKOUT_VENTANA_MS,
+    );
+    if (!rate.allowed) {
+      return {
+        success: false,
+        message: `Demasiados pedidos creados en poco tiempo. Inténtalo de nuevo en ${Math.ceil(
+          rate.retryAfterSeconds / 60,
+        )} minuto(s).`,
+      };
+    }
+
     const parsed = parseCheckout(formData);
     const validated = CheckoutSchema.safeParse(parsed);
 
@@ -71,6 +104,9 @@ export async function createCheckoutAction(
       archivosAdjuntos: archivos,
     });
 
+    const contacto = await obtenerConfigContacto();
+    const whatsappDestino = contacto.whatsapp || DEFAULT_WHATSAPP;
+
     const mensaje = construirMensajeWhatsapp({
       codigo: pedido.codigo,
       nombreCliente: pedido.cliente.nombre,
@@ -81,6 +117,7 @@ export async function createCheckoutAction(
       })),
       total: Number(pedido.total),
       metodoEnvio: pedido.metodoEnvio,
+      notaPersonalizada: contacto.mensajeCheckout,
     });
 
     return {
@@ -88,6 +125,7 @@ export async function createCheckoutAction(
       pedidoCodigo: pedido.codigo,
       pedidoToken: pedido.tokenSeguimiento,
       whatsappMessage: mensaje,
+      whatsappNumber: whatsappDestino,
       clienteNombre: pedido.cliente.nombre,
       clienteWhatsapp: pedido.cliente.whatsapp,
     };

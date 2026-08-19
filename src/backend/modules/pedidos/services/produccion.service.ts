@@ -18,7 +18,9 @@ export async function registrarAvanceProduccion(params: {
   usuarioId?: string;
   orden?: number;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
+    params.pedidoId,
+  );
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,
@@ -50,11 +52,23 @@ export async function obtenerAvancesProduccion(pedidoId: string) {
   return repository.listarAvancesProduccion(pedidoId);
 }
 
-export async function eliminarAvanceProduccion(
-  id: string,
-  pedidoId: string,
-) {
+export async function eliminarAvanceProduccion(id: string, pedidoId: string) {
   const avance = await repository.eliminarAvanceProduccion(id, pedidoId);
+
+  // Además de borrar el registro en base de datos, se elimina el archivo
+  // del bucket para no dejar fotos/videos huérfanos ocupando storage.
+  const marker = `/storage/v1/object/public/${STORAGE_BUCKETS.PRODUCCION_AVANCES}/`;
+  const index = avance.url.indexOf(marker);
+  if (index !== -1) {
+    const path = decodeURIComponent(avance.url.slice(index + marker.length));
+    try {
+      await deleteFile({ bucket: STORAGE_BUCKETS.PRODUCCION_AVANCES, path });
+    } catch {
+      // Un archivo huérfano en storage no debe bloquear la eliminación del
+      // registro en base de datos, que es la operación que el usuario pidió.
+    }
+  }
+
   return avance;
 }
 
@@ -73,7 +87,9 @@ export async function registrarComentarioProduccion(params: {
   usuarioId?: string;
   autorNombre?: string;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
+    params.pedidoId,
+  );
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,
@@ -108,7 +124,9 @@ export async function crearSolicitudCambio(params: {
   creadorPor?: string;
   comentarioInicial?: string;
 }) {
-  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(params.pedidoId);
+  const pedido = await pedidoRepository.obtenerPedidoDetalleAdmin(
+    params.pedidoId,
+  );
   if (!pedido) {
     throw new AppError("Pedido no encontrado.", {
       statusCode: 404,

@@ -36,11 +36,17 @@ function calcularTotales(items: CartItem[], costoEnvio: number) {
 
 export { calcularCostoEnvio, construirMensajeWhatsapp };
 
-async function generarCodigoPedido(): Promise<{ codigo: string; token: string }> {
+async function generarCodigoPedido(): Promise<{
+  codigo: string;
+  token: string;
+}> {
   const anio = new Date().getFullYear();
   const siguiente = await repository.siguienteNumeroPedido(anio);
   const codigo = `EML-${anio}-${padNumeroPedido(siguiente)}`;
-  const token = `${codigo}-${randomUUID().slice(0, 8).toUpperCase()}`;
+  // Se usa el UUID completo (no solo un fragmento) como sufijo no adivinable
+  // del token de seguimiento público: el endpoint no requiere autenticación,
+  // por lo que su seguridad depende enteramente de la entropía del token.
+  const token = `${codigo}-${randomUUID().toUpperCase()}`;
   return { codigo, token };
 }
 
@@ -66,8 +72,8 @@ export async function crearPedido({
     empresa: checkout.cliente.empresa?.trim() || null,
   };
 
-  const itemsData: Prisma.ItemPedidoCreateManyPedidoInput[] = checkout.items.map(
-    (item) => ({
+  const itemsData: Prisma.ItemPedidoCreateManyPedidoInput[] =
+    checkout.items.map((item) => ({
       productoId: item.productoId,
       varianteId: item.opciones.length > 0 ? item.opciones[0]!.opcionId : null,
       nombreProducto: item.nombre,
@@ -75,8 +81,7 @@ export async function crearPedido({
       cantidad: item.cantidad,
       personalizaciones: personalizacionesItemToJson(item),
       subtotal: item.precioUnitario * item.cantidad,
-    }),
-  );
+    }));
 
   const envioData: Prisma.EnvioCreateManyPedidoInput = {
     metodo: checkout.envio.metodo,
@@ -187,7 +192,7 @@ export async function cambiarEstadoPedido(
   }
 
   const estadoAnterior = pedido.estado as EstadoPedido;
-  const estadoNuevo = input.estado as EstadoPedido;
+  const estadoNuevo = input.estado;
   const permitidos = TRANSICIONES_PERMITIDAS[estadoAnterior] ?? [];
 
   if (!permitidos.includes(estadoNuevo) && estadoAnterior !== estadoNuevo) {
@@ -274,3 +279,6 @@ export async function actualizarGuiaEnvio(params: {
   return repository.actualizarEnvioTransaccion(params);
 }
 
+export async function listarEnvios(limit = 50) {
+  return repository.listarEnvios(limit);
+}

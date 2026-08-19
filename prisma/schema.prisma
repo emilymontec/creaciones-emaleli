@@ -475,3 +475,23 @@ model Configuracion {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+/// Registro de auditoría de acciones administrativas sensibles (quién hizo
+/// qué y cuándo). No se relaciona con Usuario mediante una FK con
+/// onDelete: Cascade a propósito: el registro debe sobrevivir aunque el
+/// usuario que lo generó sea eliminado más adelante, por eso usuarioId es
+/// un campo suelto (con el nombre ya desnormalizado) en vez de una relación.
+model RegistroAuditoria {
+  id          String   @id @default(cuid())
+  usuarioId   String?
+  usuarioNombre String?
+  accion      String
+  entidad     String
+  entidadId   String?
+  detalle     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([entidad, entidadId])
+  @@index([usuarioId])
+  @@index([createdAt])
+}

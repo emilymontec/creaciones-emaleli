@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   ShoppingBag,
   Truck,
   ArrowRight,
   ShieldCheck,
-  Tag,
   MessageCircle,
 } from "lucide-react";
 import { Drawer } from "@/src/frontend/components/ui/Drawer";
@@ -16,30 +14,22 @@ import { EmptyState } from "@/src/frontend/components/ui/EmptyState";
 import { formatCOP } from "@/src/shared/lib/pricing";
 import { useCart } from "./CartContext";
 import { CartLineItem } from "./CartLineItem";
+import type { ContactoConfigInput } from "@/src/backend/modules/configuracion/schemas/configuracion.schema";
 
 const FREE_SHIPPING_THRESHOLD = 60000;
-const EMPRESA_WHATSAPP = process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
+const DEFAULT_WHATSAPP =
+  process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
 
-export function CartDrawer() {
+export function CartDrawer({ contacto }: { contacto?: ContactoConfigInput }) {
   const { items, isDrawerOpen, closeDrawer, subtotal, totalItems } = useCart();
-  const [coupon, setCoupon] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
+  const whatsapp = contacto?.whatsapp || DEFAULT_WHATSAPP;
+  const mensajePrefijo = contacto?.mensajeCheckout?.trim();
 
   const faltanteEnvioGratis = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const porcentajeEnvioGratis = Math.min(
     100,
     Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100),
   );
-
-  const descuentoCupon = couponApplied ? subtotal * 0.1 : 0;
-  const totalFinal = Math.max(0, subtotal - descuentoCupon);
-
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (coupon.trim()) {
-      setCouponApplied(true);
-    }
-  };
 
   const buildWhatsAppLink = () => {
     let msg = `*Hola Creaciones Emaleli!* Quiero realizar este pedido:\n\n`;
@@ -52,9 +42,10 @@ export function CartDrawer() {
       if (opts.length > 0) msg += `   Detalles: ${opts.join(", ")}\n`;
       msg += `   Subtotal: ${formatCOP(item.precioUnitario * item.cantidad)}\n\n`;
     });
-    msg += `*Total Estimado:* ${formatCOP(totalFinal)}\n`;
-    msg += `Por favor ayúdame con los detalles de pago y envío.`;
-    return `https://wa.me/${EMPRESA_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+    msg += `*Total Estimado:* ${formatCOP(subtotal)}\n`;
+    msg +=
+      mensajePrefijo || `Por favor ayúdame con los detalles de pago y envío.`;
+    return `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
   };
 
   return (
@@ -81,48 +72,25 @@ export function CartDrawer() {
       footer={
         items.length > 0 ? (
           <div className="space-y-3 bg-gray-50/70 -mx-5 -mb-4 p-5 border-t border-gray-200">
-            {/* Cupón de descuento */}
-            <form onSubmit={handleApplyCoupon} className="flex gap-2">
-              <div className="relative flex-1">
-                <Tag className="absolute left-3 top-2.5 size-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={coupon}
-                  onChange={(e) => setCoupon(e.target.value)}
-                  placeholder="Código de cupón"
-                  className="w-full rounded-pill border border-gray-300 bg-white py-1.5 pl-9 pr-3 text-xs focus:border-accent-500 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="rounded-pill bg-gray-900 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
-              >
-                Aplicar
-              </button>
-            </form>
-
-            {couponApplied && (
-              <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-2 text-xs font-semibold text-emerald-700">
-                <span>Descuento cupón (10% OFF):</span>
-                <span>-{formatCOP(descuentoCupon)}</span>
-              </div>
-            )}
-
             {/* Desglose */}
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal:</span>
-                <span className="font-semibold text-gray-900">{formatCOP(subtotal)}</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCOP(subtotal)}
+                </span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Envío estimado:</span>
                 <span className="font-semibold text-emerald-600">
-                  {subtotal >= FREE_SHIPPING_THRESHOLD ? "Gratis" : "Calculado al pedir"}
+                  {subtotal >= FREE_SHIPPING_THRESHOLD
+                    ? "Gratis"
+                    : "Calculado al pedir"}
                 </span>
               </div>
               <div className="flex justify-between border-t border-gray-200 pt-2 text-sm font-extrabold text-gray-900">
                 <span>Total:</span>
-                <span className="text-accent-600">{formatCOP(totalFinal)}</span>
+                <span className="text-accent-600">{formatCOP(subtotal)}</span>
               </div>
             </div>
 
@@ -140,7 +108,12 @@ export function CartDrawer() {
               </a>
 
               <Link href="/carrito" onClick={closeDrawer} className="w-full">
-                <Button variant="ghost" fullWidth size="sm" className="rounded-pill border border-gray-300">
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  size="sm"
+                  className="rounded-pill border border-gray-300"
+                >
                   Ver detalle completo del carrito
                   <ArrowRight className="size-3.5 ml-1" />
                 </Button>

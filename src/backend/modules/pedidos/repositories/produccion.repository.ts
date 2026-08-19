@@ -2,8 +2,6 @@ import { prisma } from "@/src/backend/shared/prisma";
 import type {
   Prisma,
   TipoMedioProduccion,
-  VisibilidadComentario,
-  OrigenSolicitudCambio,
   EstadoSolicitudCambio,
 } from "@/generated/prisma/client";
 
@@ -80,7 +78,8 @@ export async function agregarComentarioProduccion(
           descripcion: comentario.contenido.slice(0, 200),
           metadata: {
             comentarioId: comentario.id,
-            autor: comentario.autorNombre ?? comentario.usuario?.nombre ?? "Equipo",
+            autor:
+              comentario.autorNombre ?? comentario.usuario?.nombre ?? "Equipo",
           },
         },
       });

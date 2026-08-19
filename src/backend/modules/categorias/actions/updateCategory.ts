@@ -9,11 +9,15 @@ import {
   uploadCatalogImage,
 } from "@/src/backend/shared/uploadEntityImage";
 import type { CategoryFormState } from "./createCategory";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export async function updateCategoryAction(
   prevState: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const id = formData.get("id");
   const imagenFile = getOptionalFile(formData, "imagenArchivo");
   const imagenActual = (formData.get("imagenActual") as string) || undefined;

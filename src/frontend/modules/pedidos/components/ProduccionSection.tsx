@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useActionState } from "react";
+import NextImage from "next/image";
 import clsx from "clsx";
 import {
   Image as ImageIcon,
@@ -84,18 +85,22 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
     subirAvanceProduccionAction,
     initialAction,
   );
-  const [comentProdState, comentProdDispatch, comentProdPending] = useActionState(
-    agregarComentarioProduccionAction,
-    initialAction,
-  );
-  const [solicitudCreateState, solicitudCreateDispatch, solicitudCreatePending] =
-    useActionState(crearSolicitudCambioAction, initialAction);
+  const [comentProdState, comentProdDispatch, comentProdPending] =
+    useActionState(agregarComentarioProduccionAction, initialAction);
+  const [
+    solicitudCreateState,
+    solicitudCreateDispatch,
+    solicitudCreatePending,
+  ] = useActionState(crearSolicitudCambioAction, initialAction);
   const [respuestaState, respuestaDispatch, respuestaPending] = useActionState(
     responderSolicitudCambioAction,
     initialAction,
   );
-  const [comentSolicitudState, comentSolicitudDispatch, comentSolicitudPending] =
-    useActionState(agregarComentarioSolicitudAction, initialAction);
+  const [
+    comentSolicitudState,
+    comentSolicitudDispatch,
+    comentSolicitudPending,
+  ] = useActionState(agregarComentarioSolicitudAction, initialAction);
 
   const [visibleClienteCheck, setVisibleClienteCheck] = useState(true);
   const [comentProd, setComentProd] = useState("");
@@ -118,9 +123,9 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
 
   const recargar = async () => {
     startTransition(async () => {
-      const res = await fetch(
-        `/api/pedidos/${pedidoId}/produccion`,
-      ).catch(() => null);
+      const res = await fetch(`/api/pedidos/${pedidoId}/produccion`).catch(
+        () => null,
+      );
       if (res && res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -160,6 +165,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
         title: comentProdState.message ?? "Comentario agregado",
         variant: "success",
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza el formulario tras completar la Server Action
       setComentProd("");
       recargar();
     } else if (comentProdState.error) {
@@ -178,6 +184,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
         title: solicitudCreateState.message ?? "Solicitud creada",
         variant: "success",
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza el formulario tras completar la Server Action
       setSolicitudModalOpen(false);
       recargar();
     } else if (solicitudCreateState.error) {
@@ -196,6 +203,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
         title: respuestaState.message ?? "Respuesta registrada",
         variant: "success",
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza el formulario tras completar la Server Action
       setRespuestaModal(null);
       setTextoRespuesta("");
       recargar();
@@ -215,6 +223,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
         title: comentSolicitudState.message ?? "Comentario agregado",
         variant: "success",
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza el formulario tras completar la Server Action
       setComentSolicitudModal(null);
       setNuevoComentSolicitud("");
       recargar();
@@ -364,8 +373,8 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
 
         {avances.length === 0 ? (
           <p className="text-sm text-gray-500 p-4">
-            No hay avances de producción todavía. Sube la primera foto/video para
-            documentar el proceso.
+            No hay avances de producción todavía. Sube la primera foto/video
+            para documentar el proceso.
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -376,10 +385,12 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
               >
                 {a.tipo === "IMAGEN" ? (
                   <div className="relative aspect-square w-full bg-gray-100">
-                    <img
+                    <NextImage
                       src={a.url}
                       alt={a.titulo || a.nombre || "avance"}
-                      className="size-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover"
                     />
                   </div>
                 ) : (
@@ -402,9 +413,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                       )}
                       {a.tipo === "IMAGEN" ? "Foto" : "Video"}
                     </span>
-                    <Badge
-                      variant={a.visibleCliente ? "success" : "neutral"}
-                    >
+                    <Badge variant={a.visibleCliente ? "success" : "neutral"}>
                       {a.visibleCliente ? "Cliente" : "Interno"}
                     </Badge>
                   </div>
@@ -514,9 +523,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
         </form>
 
         {comentarios.length === 0 ? (
-          <p className="text-sm text-gray-500 p-4">
-            Sin comentarios todavía.
-          </p>
+          <p className="text-sm text-gray-500 p-4">Sin comentarios todavía.</p>
         ) : (
           <ul className="space-y-3">
             {comentarios.map((c) => (
@@ -536,7 +543,11 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                       · {new Date(c.createdAt).toLocaleString("es-CO")}
                     </span>
                   </p>
-                  <Badge variant={c.visibilidad === "CLIENTE" ? "success" : "neutral"}>
+                  <Badge
+                    variant={
+                      c.visibilidad === "CLIENTE" ? "success" : "neutral"
+                    }
+                  >
                     {c.visibilidad === "CLIENTE" ? "Cliente" : "Interno"}
                   </Badge>
                 </div>
@@ -579,7 +590,9 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <Badge variant="info">
-                        {s.origen === "CLIENTE" ? "Del cliente" : "Equipo Emaleli"}
+                        {s.origen === "CLIENTE"
+                          ? "Del cliente"
+                          : "Equipo Emaleli"}
                       </Badge>
                       <span
                         className={clsx(
@@ -596,7 +609,9 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                             "bg-gray-100 text-gray-800 border-gray-200",
                         )}
                       >
-                        {s.estado === "APROBADA" && <Check className="size-3" />}
+                        {s.estado === "APROBADA" && (
+                          <Check className="size-3" />
+                        )}
                         {s.estado === "RECHAZADA" && <X className="size-3" />}
                         {SOLICITUD_ESTADO_LABEL[s.estado] || s.estado}
                       </span>
@@ -658,7 +673,9 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
                         </span>
                       )}
                     </p>
-                    <p className="text-sm text-gray-800">{s.respuestaCliente}</p>
+                    <p className="text-sm text-gray-800">
+                      {s.respuestaCliente}
+                    </p>
                   </div>
                 )}
 
@@ -753,11 +770,7 @@ export function ProduccionSection({ pedidoId }: { pedidoId: string }) {
           description="La respuesta quedará visible para el cliente."
         >
           <form action={respuestaDispatch} className="space-y-4">
-            <input
-              type="hidden"
-              name="solicitudId"
-              value={respuestaModal.id}
-            />
+            <input type="hidden" name="solicitudId" value={respuestaModal.id} />
             <Textarea
               name="respuesta"
               label="Respuesta al cliente"

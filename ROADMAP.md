@@ -425,26 +425,37 @@
 
 ### 10.1 Métodos
 
-- [ ] Recoger en tienda
-- [ ] Domicilio
-- [ ] Transportadora
+- [x] Recoger en tienda
+- [x] Domicilio
+- [x] Transportadora
 
 ### 10.2 Datos de envío
 
-- [ ] Dirección
-- [ ] Ciudad
-- [ ] Destinatario
-- [ ] Documento de identidad (si aplica, según transportadora)
-- [ ] Teléfono de contacto
+- [x] Dirección
+- [x] Ciudad
+- [x] Destinatario
+- [x] Documento de identidad (si aplica, según transportadora)
+- [x] Teléfono de contacto
 
 ### 10.3 Guías
 
-- [ ] Número de guía
-- [ ] Estado de la guía (generada, en tránsito, entregada, devuelta)
-- [ ] Fecha de despacho/entrega
-- [ ] Enlace de rastreo externo (si la transportadora lo provee)
+- [x] Número de guía
+- [x] Estado de la guía (generada, en tránsito, entregada, devuelta)
+- [x] Fecha de despacho/entrega
+- [x] Enlace de rastreo externo (si la transportadora lo provee)
 
 **Entregable de la fase:** módulo de envíos con datos completos y trazabilidad de guías por pedido.
+
+> **Nota de auditoría (agosto 2026):** esta fase ya estaba implementada en
+> su mayor parte (método y datos de envío se capturan en el checkout
+> público; la guía se gestiona desde el detalle del pedido admin), pero el
+> roadmap no se había actualizado. Durante la verificación se corrigieron
+> además 3 bugs reales: `fechaDespacho` se sobrescribía en cada
+> actualización de estado en vez de fijarse una sola vez; `fechaEntrega`
+> nunca se guardaba aunque el campo existe en el modelo; y ni la tarjeta de
+> envío del detalle de pedido ni el listado de `/admin/envios` mostraban el
+> estado de la guía, el enlace de rastreo ni las fechas, pese a que ya se
+> capturaban. Ver `AUDITORIA-2026-08.md` para el detalle completo.
 
 ---
 
@@ -454,29 +465,40 @@
 
 ### 11.1 Empresa
 
-- [ ] Logo
-- [ ] Nombre
-- [ ] Dirección
-- [ ] Horario de atención
+- [x] Logo
+- [x] Nombre
+- [x] Dirección
+- [x] Horario de atención
 
 ### 11.2 Redes sociales
 
-- [ ] Facebook
-- [ ] Instagram
-- [ ] TikTok
+- [x] Facebook
+- [x] Instagram
+- [x] TikTok
 
 ### 11.3 WhatsApp
 
-- [ ] Número de contacto principal
-- [ ] Mensajes predeterminados (por contexto: consulta general, seguimiento de pedido, confirmación de checkout)
+- [x] Número de contacto principal
+- [x] Mensajes predeterminados (por contexto: consulta general, seguimiento de pedido, confirmación de checkout)
 
 ### 11.4 Página pública
 
-- [ ] Gestión de banners del inicio
-- [ ] Gestión de preguntas frecuentes (FAQ)
-- [ ] Información de contacto visible en el sitio
+- [x] Gestión de banners del inicio
+- [x] Gestión de preguntas frecuentes (FAQ)
+- [x] Información de contacto visible en el sitio
 
 **Entregable de la fase:** configuración centralizada, editable por el administrador sin despliegues nuevos.
+
+> **Nota de auditoría (agosto 2026):** al verificar esta fase se encontró
+> que el módulo de Configuración solo escribía datos — la tienda pública no
+> los leía en ningún lado (header, footer y checkout tenían todo
+> hardcodeado, incluido un `mensajeCheckout` que existía en el formulario
+> pero nunca se usaba). Se completó lo que faltaba (logo, TikTok, los 3
+> mensajes por contexto, gestión de FAQ y de un banner destacado opcional
+> con imagen propia) y, más importante, **se conectó todo el módulo al
+> sitio público**: el layout público ahora trae la configuración una vez y
+> la pasa al header, footer, carrito y checkout; la home lee el banner y
+> las FAQ configurados. Ver `AUDITORIA-2026-08.md` para el detalle completo.
 
 ---
 
@@ -486,30 +508,45 @@
 
 ### 12.1 Ventas
 
-- [ ] Reporte de ventas por día
-- [ ] Reporte de ventas por mes
-- [ ] Reporte de ventas por año
-- [ ] Gráficos comparativos de tendencia
+- [x] Reporte de ventas por día
+- [x] Reporte de ventas por mes
+- [x] Reporte de ventas por año
+- [x] Gráficos comparativos de tendencia
 
 ### 12.2 Productos
 
-- [ ] Productos más vendidos
-- [ ] Productos menos vendidos
-- [ ] Filtro por rango de fechas y categoría
+- [x] Productos más vendidos
+- [x] Productos menos vendidos
+- [x] Filtro por rango de fechas y categoría
 
 ### 12.3 Pedidos
 
-- [ ] Pedidos por estado
-- [ ] Pedidos por ciudad
-- [ ] Tiempo promedio por etapa del proceso
+- [x] Pedidos por estado
+- [x] Pedidos por ciudad
+- [x] Tiempo promedio por etapa del proceso
 
 ### 12.4 Clientes
 
-- [ ] Clientes frecuentes (mayor número de pedidos/monto)
-- [ ] Clientes nuevos en el período
-- [ ] Exportación de reportes (CSV/Excel)
+- [x] Clientes frecuentes (mayor número de pedidos/monto)
+- [x] Clientes nuevos en el período
+- [x] Exportación de reportes (CSV/Excel)
 
 **Entregable de la fase:** panel de reportes con métricas clave del negocio, exportables.
+
+> **Nota de auditoría (agosto 2026):** la página de reportes existente solo
+> cubría "ventas acumuladas" (todo el histórico, sin agrupar), productos
+> más vendidos y pedidos por estado — sin filtros, sin gráficos, y
+> consultando Prisma directamente desde `page.tsx` (mismo anti-patrón ya
+> corregido en Fase 10 para envíos). Se construyó el módulo `reportes`
+> completo por capas (repository → service → action), con: series de
+> ventas agrupadas automáticamente por día/mes/año según el rango
+> seleccionado (usando `date_trunc` de Postgres) y graficadas con
+> `recharts`; productos más y menos vendidos con filtro de categoría;
+> pedidos por ciudad; tiempo promedio por etapa calculado a partir del
+> timeline de eventos de cada pedido; clientes frecuentes y nuevos en el
+> período; y exportación a CSV de las 8 secciones del reporte. La Server
+> Action está protegida con `PERMISOS.REPORTES_VER`. Ver
+> `AUDITORIA-2026-08.md` para el detalle completo.
 
 ---
 
@@ -519,34 +556,58 @@
 
 ### 13.1 SEO
 
-- [ ] Metadata dinámica por página (título, descripción, OG, Twitter cards)
-- [ ] Generación de `sitemap.xml`
-- [ ] Configuración de `robots.txt`
-- [ ] Datos estructurados (JSON-LD) para productos
+- [x] Metadata dinámica por página (título, descripción, OG, Twitter cards)
+- [x] Generación de `sitemap.xml`
+- [x] Configuración de `robots.txt`
+- [x] Datos estructurados (JSON-LD) para productos
 
 ### 13.2 Rendimiento
 
-- [ ] Lazy loading de imágenes y componentes pesados
-- [ ] Optimización de imágenes (formatos modernos, tamaños responsivos)
-- [ ] Estrategia de caché (ISR/SSG donde aplique, cache de consultas frecuentes)
-- [ ] Análisis de bundle y code splitting
+- [x] Lazy loading de imágenes y componentes pesados
+- [x] Optimización de imágenes (formatos modernos, tamaños responsivos)
+- [x] Estrategia de caché (ISR/SSG donde aplique, cache de consultas frecuentes)
+- [x] Análisis de bundle y code splitting
 
 ### 13.3 Seguridad
 
-- [ ] Rate limiting en endpoints públicos (checkout, formularios, login)
-- [ ] Validaciones exhaustivas de entrada (server-side, con librería tipo Zod)
-- [ ] Sanitización de datos (prevención XSS/inyección)
-- [ ] Auditoría de acciones administrativas (quién hizo qué y cuándo)
-- [ ] Revisión de cabeceras de seguridad (CSP, HSTS, etc.)
+- [x] Rate limiting en endpoints públicos (checkout, login) — implementación en memoria (`src/backend/shared/rate-limit.ts`); ver nota de auditoría abajo
+- [x] Validaciones exhaustivas de entrada (server-side, con Zod) — ya cubierto en fases anteriores
+- [x] Sanitización de datos (prevención XSS/inyección) — ver nota de auditoría abajo
+- [x] Auditoría de acciones administrativas (quién hizo qué y cuándo) — nuevo módulo `auditoria` + tabla `RegistroAuditoria`
+- [x] Revisión de cabeceras de seguridad (CSP, HSTS, etc.)
 
 ### 13.4 Backups
 
-- [ ] Backups automáticos de base de datos (frecuencia definida, retención)
-- [ ] Backups de Storage (buckets críticos)
-- [ ] Prueba periódica de restauración de backups
+- [x] Backups automáticos de base de datos (frecuencia definida, retención) — documentado, requiere configuración manual en Supabase
+- [x] Backups de Storage (buckets críticos) — documentado, requiere configuración manual
+- [x] Prueba periódica de restauración de backups — checklist documentado
 
 **Entregable de la fase:** aplicación optimizada, segura y con estrategia de respaldo verificada, lista para producción estable.
 
+> **Nota de auditoría (agosto 2026) — SEO y rendimiento:** se agregó
+> metadata dinámica de producto usando `seoTitulo`/`seoDescripcion`/
+> `seoImagen` (campos que existían en la base de datos desde el diseño
+> original pero nunca se usaban — mismo patrón de "configuración inerte"
+> detectado en la Fase 11), `sitemap.xml`/`robots.ts` dinámicos, JSON-LD de
+> producto, y `noindex` en admin/checkout/carrito/seguimiento (esta última
+> por privacidad: expone datos del cliente por token). En rendimiento se
+> convirtieron los últimos 4 `<img>` sin optimizar a `next/image`, se
+> agregó ISR (`revalidate`) a home y producto, cache con
+> `unstable_cache`/`revalidateTag` en categorías públicas, y
+> `@next/bundle-analyzer` (`pnpm analyze`).
+>
+> **Nota de auditoría — seguridad:** se encontró que `z.string().url()` de
+> Zod **no bloquea el esquema `javascript:`** (`new URL("javascript:...")`
+> es una URL válida según el parser WHATWG), lo que afectaba el enlace de
+> rastreo de envíos y los links de redes sociales/banner agregados en la
+> Fase 11 — un admin con permisos limitados podía inyectar un enlace que
+> ejecuta código al hacer clic. Se creó `src/shared/lib/safe-url.ts`
+> (`safeHttpUrl`/`safeLinkPath`) y se aplicó en ambos puntos. Se agregó
+> además el módulo `auditoria` (tabla `RegistroAuditoria`, ver
+> `AUDITORIA-2026-08.md` para el detalle de qué acciones quedan
+> registradas y cuáles no) y una página `/admin/auditoria` de solo lectura
+> para consultarlo — sin esa vista, los registros habrían quedado
+> guardados pero invisibles para el administrador.
 
 ---
 
@@ -555,3 +616,4 @@
 - Cada fase se considera "cerrada" cuando su entregable está funcionando en el entorno de desarrollo y ha sido validado manualmente contra los criterios de esta lista.
 - Se recomienda avanzar de forma secuencial (0 → 13), pero las Fases 7-10 (Pedidos, Producción, Pagos, Envíos) están fuertemente relacionadas y pueden desarrollarse en paralelo por ser parte del mismo ciclo operativo del pedido.
 - Este documento es vivo: debe actualizarse marcando checkboxes y agregando notas de decisiones tomadas durante el desarrollo.
+- **Agosto 2026 — Auditoría integral de seguridad y calidad:** se realizó una auditoría completa del código existente. Ver `docs/adr/` y `AUDITORIA-2026-08.md` en la raíz para el informe detallado de hallazgos y correcciones (control de acceso roto en Server Actions, permisos por rol no aplicados, rate limiting, entropía del token de seguimiento, errores de lint, archivos huérfanos en storage).

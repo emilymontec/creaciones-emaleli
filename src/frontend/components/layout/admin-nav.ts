@@ -5,6 +5,7 @@ import {
   Factory,
   LayoutDashboard,
   Package,
+  ScrollText,
   Settings,
   Tag,
   Truck,
@@ -55,6 +56,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { href: "/admin/clientes", label: "Clientes", icon: Users },
       { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
       { href: "/admin/configuracion", label: "Configuración", icon: Settings },
+      { href: "/admin/auditoria", label: "Auditoría", icon: ScrollText },
     ],
   },
   {

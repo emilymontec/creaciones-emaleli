@@ -9,6 +9,8 @@ import {
   getOptionalFile,
   uploadCatalogImage,
 } from "@/src/backend/shared/uploadEntityImage";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export type CategoryFormState = {
   success: boolean;
@@ -20,6 +22,8 @@ export async function createCategoryAction(
   prevState: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const imagenFile = getOptionalFile(formData, "imagenArchivo");
 
   const result = CategorySchema.safeParse({

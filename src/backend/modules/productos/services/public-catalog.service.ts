@@ -40,3 +40,7 @@ export async function getRelatedProducts(
 ) {
   return repository.findRelated(productoId, categoriaIds, limit);
 }
+
+export async function getAllActiveProductSlugs() {
+  return repository.findAllActiveSlugs();
+}

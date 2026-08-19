@@ -5,6 +5,8 @@ import { ConfiguracionForms } from "@/src/frontend/modules/configuracion/compone
 import {
   obtenerConfigEmpresa,
   obtenerConfigContacto,
+  obtenerConfigFaq,
+  obtenerConfigBanner,
 } from "@/src/backend/modules/configuracion/services/configuracion.service";
 
 export const metadata: Metadata = {
@@ -12,9 +14,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ConfiguracionAdminPage() {
-  const [empresa, contacto] = await Promise.all([
+  const [empresa, contacto, faq, banner] = await Promise.all([
     obtenerConfigEmpresa(),
     obtenerConfigContacto(),
+    obtenerConfigFaq(),
+    obtenerConfigBanner(),
   ]);
 
   return (
@@ -22,10 +26,15 @@ export default async function ConfiguracionAdminPage() {
       <PageHeader
         icon={Settings}
         title="Configuración de la Tienda"
-        description="Administra la información general del negocio, números de WhatsApp y parámetros del sitio."
+        description="Administra la información general del negocio, WhatsApp, redes, banner del inicio y preguntas frecuentes."
       />
 
-      <ConfiguracionForms empresa={empresa} contacto={contacto} />
+      <ConfiguracionForms
+        empresa={empresa}
+        contacto={contacto}
+        faq={faq}
+        banner={banner}
+      />
     </div>
   );
 }

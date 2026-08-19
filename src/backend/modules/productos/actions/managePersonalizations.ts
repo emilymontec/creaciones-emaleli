@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import * as personalizationService from "../services/personalization.service";
 import { PersonalizationSchema } from "../schemas/personalization.schema";
 import { toErrorMessage } from "@/src/shared/lib/errors";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export type ActionResult = { success: boolean; message?: string };
 
@@ -15,6 +17,8 @@ export async function createFieldAction(
   productoId: string,
   input: unknown,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const result = PersonalizationSchema.safeParse(input);
   if (!result.success) {
     return {
@@ -45,6 +49,8 @@ export async function updateFieldAction(
   id: string,
   input: unknown,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const result = PersonalizationSchema.safeParse(input);
   if (!result.success) {
     return {
@@ -72,6 +78,8 @@ export async function toggleFieldActivoAction(
   productoId: string,
   id: string,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await personalizationService.toggleActivo(id);
     revalidate(productoId);
@@ -85,6 +93,8 @@ export async function deleteFieldAction(
   productoId: string,
   id: string,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await personalizationService.deleteField(id);
     revalidate(productoId);
@@ -98,6 +108,8 @@ export async function reorderFieldsAction(
   productoId: string,
   orderedIds: string[],
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await personalizationService.reorderFields(orderedIds);
     revalidate(productoId);

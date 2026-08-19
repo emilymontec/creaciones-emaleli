@@ -25,6 +25,43 @@ export async function uploadCatalogImage(
   return getPublicUrl(ref);
 }
 
+/**
+ * Sube una imagen de configuración (logo, banner del inicio) al bucket
+ * público `configuracion` y devuelve su URL pública.
+ */
+export async function uploadConfigImage(
+  entityId: string,
+  file: File,
+): Promise<string> {
+  const renamed = new File([file], `${Date.now()}-${file.name}`, {
+    type: file.type,
+  });
+
+  const ref = await uploadFile({
+    bucket: STORAGE_BUCKETS.CONFIGURACION,
+    entityId,
+    file: renamed,
+  });
+
+  return getPublicUrl(ref);
+}
+
+/** Borra del bucket `configuracion` la imagen cuya URL pública se guardó. */
+export async function deleteConfigImageByUrl(url: string | null | undefined) {
+  if (!url) return;
+
+  const marker = `/storage/v1/object/public/${STORAGE_BUCKETS.CONFIGURACION}/`;
+  const index = url.indexOf(marker);
+  if (index === -1) return;
+
+  const path = decodeURIComponent(url.slice(index + marker.length));
+
+  try {
+    await deleteFile({ bucket: STORAGE_BUCKETS.CONFIGURACION, path });
+  } catch (error) {
+    logger.warn("No se pudo eliminar la imagen del storage", { path, error });
+  }
+}
 /** Extrae un File válido de FormData, o `null` si el campo está vacío. */
 export function getOptionalFile(
   formData: FormData,

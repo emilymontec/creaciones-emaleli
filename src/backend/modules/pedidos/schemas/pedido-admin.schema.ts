@@ -1,5 +1,8 @@
 import { z } from "zod";
-import type { EstadoPedido, TipoEventoTimeline } from "@/generated/prisma/client";
+import type {
+  EstadoPedido,
+  TipoEventoTimeline,
+} from "@/generated/prisma/client";
 
 export const ESTADOS_PEDIDO_ORDEN: EstadoPedido[] = [
   "NUEVO",
@@ -39,15 +42,15 @@ export const ESTADO_PEDIDO_LABEL: Record<EstadoPedido, string> = {
 
 export const ESTADO_PEDIDO_COLOR: Record<
   EstadoPedido,
-  "bg-gray-100 text-gray-700 border-gray-200" |
-  "bg-blue-50 text-blue-700 border-blue-200" |
-  "bg-amber-50 text-amber-700 border-amber-200" |
-  "bg-violet-50 text-violet-700 border-violet-200" |
-  "bg-indigo-50 text-indigo-700 border-indigo-200" |
-  "bg-purple-50 text-purple-700 border-purple-200" |
-  "bg-sky-50 text-sky-700 border-sky-200" |
-  "bg-emerald-50 text-emerald-700 border-emerald-200" |
-  "bg-red-50 text-red-700 border-red-200"
+  | "bg-gray-100 text-gray-700 border-gray-200"
+  | "bg-blue-50 text-blue-700 border-blue-200"
+  | "bg-amber-50 text-amber-700 border-amber-200"
+  | "bg-violet-50 text-violet-700 border-violet-200"
+  | "bg-indigo-50 text-indigo-700 border-indigo-200"
+  | "bg-purple-50 text-purple-700 border-purple-200"
+  | "bg-sky-50 text-sky-700 border-sky-200"
+  | "bg-emerald-50 text-emerald-700 border-emerald-200"
+  | "bg-red-50 text-red-700 border-red-200"
 > = {
   NUEVO: "bg-gray-100 text-gray-700 border-gray-200",
   EN_REVISION: "bg-blue-50 text-blue-700 border-blue-200",
@@ -73,7 +76,9 @@ export const TIPO_EVENTO_LABEL: Record<TipoEventoTimeline, string> = {
 };
 
 export const ListarPedidosSchema = z.object({
-  estado: z.string().optional(),
+  estado: z
+    .enum(ESTADOS_PEDIDO_ORDEN as [EstadoPedido, ...EstadoPedido[]])
+    .optional(),
   ciudad: z.string().trim().optional(),
   cliente: z.string().trim().optional(),
   fechaDesde: z.string().optional(),
@@ -86,7 +91,7 @@ export type ListarPedidosInput = z.infer<typeof ListarPedidosSchema>;
 
 export const CambiarEstadoSchema = z.object({
   pedidoId: z.string().min(1),
-  estado: z.string().min(1),
+  estado: z.enum(ESTADOS_PEDIDO_ORDEN as [EstadoPedido, ...EstadoPedido[]]),
   descripcion: z.string().trim().max(500).optional(),
 });
 

@@ -1,70 +1,40 @@
-"use client";
+import { HelpCircle } from "lucide-react";
+import type { FaqItem } from "@/src/backend/modules/configuracion/schemas/configuracion.schema";
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import clsx from "clsx";
-
-// Contenido estático temporal: pasará a Configuración > Página pública en
-// la Fase 11.
-const FAQS = [
-  {
-    pregunta: "¿Cómo funciona la personalización de productos?",
-    respuesta:
-      "Eliges el producto, seleccionas variantes como talla o color y completas los campos de personalización (texto, imagen, etc.) según lo que ofrezca cada producto. Verás el precio total actualizarse en tiempo real.",
-  },
-  {
-    pregunta: "¿Cuánto tarda la producción de mi pedido?",
-    respuesta:
-      "Cada producto muestra su tiempo estimado de producción en días. Si tu pedido tiene varios productos, se toma el tiempo del ítem más lento como estimado general.",
-  },
-  {
-    pregunta: "¿Cómo se confirma y paga el pedido?",
-    respuesta:
-      "Al finalizar el checkout se genera un código de pedido y se abre un chat de WhatsApp con el resumen prellenado para coordinar el pago y los detalles finales contigo.",
-  },
-  {
-    pregunta: "¿Puedo hacer seguimiento a mi pedido?",
-    respuesta:
-      "Sí, cada pedido tiene un enlace de seguimiento único donde puedes ver el estado actual y las actualizaciones de producción, sin necesidad de iniciar sesión.",
-  },
-];
-
-export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+export function FaqSection({ items }: { items: FaqItem[] }) {
+  if (items.length === 0) return null;
 
   return (
-    <section>
-      <h2 className="mb-4 font-display text-xl font-bold text-gray-900">
-        Preguntas frecuentes
-      </h2>
-      <div className="divide-y divide-gray-100 rounded-card bg-white shadow-card">
-        {FAQS.map((faq, index) => {
-          const isOpen = openIndex === index;
-          return (
-            <div key={faq.pregunta}>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-              >
-                <span className="text-sm font-semibold text-gray-800">
-                  {faq.pregunta}
+    <section aria-labelledby="faq-heading" className="scroll-mt-20">
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex size-10 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+          <HelpCircle className="size-5" />
+        </div>
+        <h2
+          id="faq-heading"
+          className="font-display text-xl font-bold text-gray-900 sm:text-2xl"
+        >
+          Preguntas frecuentes
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((item) => (
+          <details
+            key={item.id}
+            className="group rounded-card border border-gray-100 bg-white p-4 shadow-card open:shadow-card-hover"
+          >
+            <summary className="cursor-pointer list-none text-sm font-semibold text-gray-900 marker:content-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500">
+              <span className="flex items-start justify-between gap-3">
+                {item.pregunta}
+                <span className="shrink-0 text-primary-500 transition-transform group-open:rotate-45">
+                  +
                 </span>
-                <ChevronDown
-                  className={clsx(
-                    "size-4 shrink-0 text-gray-400 transition-transform",
-                    isOpen && "rotate-180",
-                  )}
-                />
-              </button>
-              {isOpen && (
-                <p className="px-5 pb-4 text-sm text-gray-500">
-                  {faq.respuesta}
-                </p>
-              )}
-            </div>
-          );
-        })}
+              </span>
+            </summary>
+            <p className="mt-2 text-sm text-gray-600">{item.respuesta}</p>
+          </details>
+        ))}
       </div>
     </section>
   );

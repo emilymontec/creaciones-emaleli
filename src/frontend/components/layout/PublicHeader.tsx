@@ -22,6 +22,15 @@ import {
 } from "lucide-react";
 import { useCart } from "@/src/frontend/cart/CartContext";
 import { CartDrawer } from "@/src/frontend/cart/CartDrawer";
+import type {
+  EmpresaConfigInput,
+  ContactoConfigInput,
+} from "@/src/backend/modules/configuracion/schemas/configuracion.schema";
+
+const DEFAULT_WHATSAPP =
+  process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
+const DEFAULT_MENSAJE_ASESORIA =
+  "Hola, quisiera asesoría para un producto personalizado";
 
 const CATEGORIES_NAV = [
   { label: "Descuentos", href: "/catalogo?orden=precio_asc", Icon: Percent },
@@ -29,7 +38,11 @@ const CATEGORIES_NAV = [
   { label: "Tazas & Mugs", href: "/catalogo?categoria=tazas", Icon: Coffee },
   { label: "Hoodies & Sacos", href: "/catalogo?categoria=hoodies", Icon: Wind },
   { label: "Termos", href: "/catalogo?categoria=termos", Icon: Cylinder },
-  { label: "Accesorios", href: "/catalogo?categoria=accesorios", Icon: KeyRound },
+  {
+    label: "Accesorios",
+    href: "/catalogo?categoria=accesorios",
+    Icon: KeyRound,
+  },
   { label: "Papelería", href: "/catalogo?categoria=papelera", Icon: BookOpen },
 ];
 
@@ -40,10 +53,21 @@ const QUICK_TAGS = [
   { label: "Termos 750ml", slug: "termos" },
 ];
 
-export function PublicHeader() {
+export function PublicHeader({
+  empresa,
+  contacto,
+}: {
+  empresa: EmpresaConfigInput;
+  contacto: ContactoConfigInput;
+}) {
   const { totalItems, openDrawer } = useCart();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+
+  const nombreEmpresa = empresa.nombre || "Creaciones Emaleli";
+  const whatsapp = contacto.whatsapp || DEFAULT_WHATSAPP;
+  const mensajeAsesoria =
+    contacto.mensajeConsultaGeneral || DEFAULT_MENSAJE_ASESORIA;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,8 +104,8 @@ export function PublicHeader() {
         <Link href="/" className="group flex items-center gap-3 shrink-0">
           <div className="flex items-center justify-center rounded-xl overflow-hidden transition-transform group-hover:scale-105">
             <Image
-              src="/brand/logo-emaleli.png"
-              alt="Creaciones Emaleli"
+              src={empresa.logoUrl || "/brand/logo-emaleli.png"}
+              alt={nombreEmpresa}
               width={44}
               height={44}
               className="rounded-lg object-contain"
@@ -89,7 +113,7 @@ export function PublicHeader() {
           </div>
           <div className="flex flex-col">
             <span className="font-display text-xl font-extrabold tracking-tight text-primary-700">
-              Creaciones Emaleli
+              {nombreEmpresa}
             </span>
             <span className="text-[10px] font-semibold text-secondary-600 uppercase tracking-widest">
               Detalles Personalizados
@@ -99,7 +123,10 @@ export function PublicHeader() {
 
         {/* Buscador Central */}
         <div className="hidden flex-1 max-w-xl md:block">
-          <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="relative flex items-center"
+          >
             <input
               type="text"
               value={searchTerm}
@@ -141,7 +168,7 @@ export function PublicHeader() {
           </Link>
 
           <a
-            href="https://wa.me/573000000000?text=Hola,%20quisiera%20asesoría%20para%20un%20producto%20personalizado"
+            href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(mensajeAsesoria)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3 py-2 rounded-pill transition-colors border border-emerald-200"
@@ -170,7 +197,10 @@ export function PublicHeader() {
 
       {/* Buscador móvil */}
       <div className="px-4 pb-2 md:hidden">
-        <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="relative flex items-center"
+        >
           <input
             type="text"
             value={searchTerm}
@@ -211,7 +241,7 @@ export function PublicHeader() {
         </div>
       </nav>
 
-      <CartDrawer />
+      <CartDrawer contacto={contacto} />
     </header>
   );
 }

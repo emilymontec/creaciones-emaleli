@@ -16,6 +16,7 @@ type Envio = {
   ciudad: string | null;
   metodo: string;
   numeroGuia: string | null;
+  estadoGuia: string | null;
   enlaceRastreo: string | null;
   pedido: {
     id: string;
@@ -33,7 +34,10 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
       key: "codigo",
       header: "Pedido",
       render: (r) => (
-        <Link href={`/admin/pedidos/${r.pedidoId}`} className="font-semibold text-primary-600 hover:underline">
+        <Link
+          href={`/admin/pedidos/${r.pedidoId}`}
+          className="font-semibold text-primary-600 hover:underline"
+        >
           {r.pedido.codigo}
         </Link>
       ),
@@ -43,7 +47,9 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
       header: "Destinatario / Ciudad",
       render: (r) => (
         <div>
-          <p className="font-medium text-gray-900">{r.destinatario || r.pedido.cliente.nombre}</p>
+          <p className="font-medium text-gray-900">
+            {r.destinatario || r.pedido.cliente.nombre}
+          </p>
           <p className="text-xs text-gray-500">{r.ciudad || r.pedido.ciudad}</p>
         </div>
       ),
@@ -53,7 +59,11 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
       header: "Método",
       render: (r) => (
         <Badge variant={r.metodo === "TRANSPORTADORA" ? "info" : "neutral"}>
-          {r.metodo === "RECOGER" ? "Recoger en Tienda" : r.metodo === "DOMICILIO" ? "Domicilio" : "Transportadora"}
+          {r.metodo === "RECOGER"
+            ? "Recoger en Tienda"
+            : r.metodo === "DOMICILIO"
+              ? "Domicilio"
+              : "Transportadora"}
         </Badge>
       ),
     },
@@ -62,9 +72,39 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
       header: "Número de Guía",
       render: (r) =>
         r.numeroGuia ? (
-          <span className="font-mono text-xs font-bold text-gray-900">{r.numeroGuia}</span>
+          <span className="font-mono text-xs font-bold text-gray-900">
+            {r.numeroGuia}
+          </span>
         ) : (
           <span className="text-xs text-gray-400 font-italic">Sin guía</span>
+        ),
+    },
+    {
+      key: "estadoGuia",
+      header: "Estado Guía",
+      render: (r) =>
+        r.estadoGuia ? (
+          <Badge
+            variant={
+              r.estadoGuia === "ENTREGADA"
+                ? "success"
+                : r.estadoGuia === "DEVUELTA"
+                  ? "error"
+                  : r.estadoGuia === "EN_TRANSITO"
+                    ? "info"
+                    : "neutral"
+            }
+          >
+            {r.estadoGuia === "GENERADA"
+              ? "Generada"
+              : r.estadoGuia === "EN_TRANSITO"
+                ? "En tránsito"
+                : r.estadoGuia === "ENTREGADA"
+                  ? "Entregada"
+                  : "Devuelta"}
+          </Badge>
+        ) : (
+          <span className="text-xs text-gray-400">—</span>
         ),
     },
     {
@@ -91,7 +131,10 @@ export function EnviosPanel({ envios }: { envios: Envio[] }) {
         />
         <StatCard
           label="Pendientes de Guía"
-          value={envios.filter((e) => !e.numeroGuia && e.metodo === "TRANSPORTADORA").length}
+          value={
+            envios.filter((e) => !e.numeroGuia && e.metodo === "TRANSPORTADORA")
+              .length
+          }
           icon={MapPin}
           iconClass="bg-gradient-to-br from-amber-100 to-coral-100 text-amber-600"
         />

@@ -50,6 +50,8 @@ export async function obtenerPerfilCompleto(id: string) {
       code: "USER_NOT_FOUND",
     });
   }
+  // Se excluye passwordHash deliberadamente: nunca debe salir del backend.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { passwordHash, ...perfil } = usuario;
   return perfil;
 }
@@ -60,7 +62,9 @@ export async function actualizarPerfilUsuario(
 ) {
   const [existingByUser, existingByEmail] = await Promise.all([
     input.username
-      ? findByUsername(input.username).then((u) => (u && u.id !== id ? u : null))
+      ? findByUsername(input.username).then((u) =>
+          u && u.id !== id ? u : null,
+        )
       : Promise.resolve(null),
     input.email
       ? findByEmail(input.email).then((u) => (u && u.id !== id ? u : null))

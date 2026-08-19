@@ -5,6 +5,7 @@ import { getSessionUser } from "../lib/session";
 import { PasswordChangeSchema } from "../schemas/perfil.schema";
 import { cambiarPasswordUsuario } from "../services/auth.service";
 import { AppError, toErrorMessage } from "@/src/shared/lib/errors";
+import { registrarAuditoria } from "@/src/backend/shared/audit-log";
 
 export type PasswordFormState = {
   success: boolean;
@@ -39,6 +40,13 @@ export async function cambiarPasswordAction(
 
   try {
     await cambiarPasswordUsuario(user.sub, result.data);
+    await registrarAuditoria({
+      usuarioId: user.sub,
+      usuarioNombre: user.nombre,
+      accion: "CONTRASENA_CAMBIADA",
+      entidad: "Usuario",
+      entidadId: user.sub,
+    });
     return {
       success: true,
       message: "Contraseña actualizada correctamente.",

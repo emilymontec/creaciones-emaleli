@@ -15,15 +15,39 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Creaciones Emaleli";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
-    default: "Creaciones Emaleli",
-    template: "%s | Creaciones Emaleli",
+    default: APP_NAME,
+    template: `%s | ${APP_NAME}`,
   },
   description:
-    "Plataforma e-commerce a medida: catálogo, personalización de productos, pedidos y producción.",
+    "Productos personalizados: camisetas, tazas, termos y más, hechos a tu medida. Envíos a todo Colombia.",
   icons: {
     icon: "/brand/logo-emaleli.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_CO",
+    siteName: APP_NAME,
+    title: APP_NAME,
+    description:
+      "Productos personalizados: camisetas, tazas, termos y más, hechos a tu medida. Envíos a todo Colombia.",
+    images: ["/brand/logo-emaleli.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: APP_NAME,
+    description:
+      "Productos personalizados: camisetas, tazas, termos y más, hechos a tu medida.",
+    images: ["/brand/logo-emaleli.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

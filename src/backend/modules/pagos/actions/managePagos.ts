@@ -1,7 +1,7 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { getSessionUser } from "../../auth/lib/session";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 import {
   RegistrarPagoSchema,
   GestionarFacturaSchema,
@@ -43,8 +43,7 @@ export async function registrarPagoConComprobanteAction(
   _prevState: PagoActionState,
   formData: FormData,
 ): Promise<PagoActionState> {
-  const user = await getSessionUser();
-  if (!user) redirect("/admin/login");
+  const user = await requireAdmin(PERMISOS.PAGOS_GESTIONAR);
 
   const comprobanteFile = getOptionalFile(formData, "comprobante");
 
@@ -84,12 +83,14 @@ export async function registrarPagoConComprobanteAction(
 export async function obtenerFacturaPedidoAction(
   pedidoId: string,
 ): Promise<FacturaActionState & { success: boolean }> {
-  const user = await getSessionUser();
-  if (!user) redirect("/admin/login");
+  await requireAdmin(PERMISOS.PAGOS_GESTIONAR);
   try {
     const factura = await obtenerFacturaPedido(pedidoId);
     if (!factura) {
-      return { success: false, error: "Este pedido aún no tiene una factura registrada." };
+      return {
+        success: false,
+        error: "Este pedido aún no tiene una factura registrada.",
+      };
     }
     return { success: true, factura };
   } catch (e) {
@@ -102,8 +103,7 @@ export async function gestionarFacturaAction(
   _prevState: FacturaActionState,
   formData: FormData,
 ): Promise<FacturaActionState> {
-  const user = await getSessionUser();
-  if (!user) redirect("/admin/login");
+  const user = await requireAdmin(PERMISOS.PAGOS_GESTIONAR);
 
   const facturaFile = getOptionalFile(formData, "facturaPdf");
 
@@ -139,8 +139,7 @@ export async function gestionarFacturaAction(
 }
 
 export async function obtenerPanelPagosAction(): Promise<PagosGeneralState> {
-  const user = await getSessionUser();
-  if (!user) redirect("/admin/login");
+  await requireAdmin(PERMISOS.PAGOS_GESTIONAR);
   try {
     const [resumen, pagos] = await Promise.all([
       obtenerResumenFinanciero(),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useFormState } from "react-dom";
 import {
@@ -31,7 +32,10 @@ import { EmptyState } from "@/src/frontend/components/ui/EmptyState";
 import { formatCOP } from "@/src/shared/lib/pricing";
 import { useCart } from "@/src/frontend/cart/CartContext";
 import type { CartItem } from "@/src/frontend/cart/types";
-import { createCheckoutAction, type CheckoutActionState } from "@/src/backend/modules/pedidos/actions/createCheckout";
+import {
+  createCheckoutAction,
+  type CheckoutActionState,
+} from "@/src/backend/modules/pedidos/actions/createCheckout";
 import {
   isColombianPhone,
   calcularCostoEnvio,
@@ -102,7 +106,8 @@ interface FormEnvio {
   documento: string;
 }
 
-const EMPRESA_WHATSAPP = process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
+const EMPRESA_WHATSAPP =
+  process.env.NEXT_PUBLIC_EMPRESA_WHATSAPP ?? "573001234567";
 
 export default function CheckoutPage() {
   const { items, isReady, subtotal, tiempoProduccionMax, clear } = useCart();
@@ -118,7 +123,9 @@ export default function CheckoutPage() {
   });
   const [observaciones, setObservaciones] = useState("");
   const [archivos, setArchivos] = useState<File[]>([]);
-  const [confirmacionesPers, setConfirmacionesPers] = useState<Record<string, boolean>>({});
+  const [confirmacionesPers, setConfirmacionesPers] = useState<
+    Record<string, boolean>
+  >({});
   const [envio, setEnvio] = useState<FormEnvio>({
     metodo: "RECOGER",
     direccion: "",
@@ -130,10 +137,10 @@ export default function CheckoutPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [actionState, formAction, isPending] = useFormState<CheckoutActionState, FormData>(
-    createCheckoutAction as never,
-    { success: false },
-  );
+  const [actionState, formAction, isPending] = useFormState<
+    CheckoutActionState,
+    FormData
+  >(createCheckoutAction as never, { success: false });
 
   const costoEnvio = useMemo(
     () => calcularCostoEnvio(envioMetodo, cliente.ciudad || ""),
@@ -169,7 +176,8 @@ export default function CheckoutPage() {
 
   const clienteSchemaValido = ClienteSchemaCliente.safeParse(cliente).success;
   const todasPersConfirmadas = items.every((i) => {
-    if (i.personalizaciones.length === 0 && i.opciones.length === 0) return true;
+    if (i.personalizaciones.length === 0 && i.opciones.length === 0)
+      return true;
     return confirmacionesPers[i.id] === true;
   });
   const envioValido =
@@ -178,7 +186,8 @@ export default function CheckoutPage() {
       : envio.direccion.trim().length >= 5 &&
         envio.destinatario.trim().length >= 3 &&
         isColombianPhone(envio.telefono) &&
-        (envioMetodo !== "TRANSPORTADORA" || envio.documento.trim().length >= 5);
+        (envioMetodo !== "TRANSPORTADORA" ||
+          envio.documento.trim().length >= 5);
 
   function canGoNext(s: StepId): boolean {
     switch (s) {
@@ -208,7 +217,13 @@ export default function CheckoutPage() {
     if (!form) return;
     const fd = new FormData(form);
     fd.set("cliente", JSON.stringify(cliente));
-    fd.set("envio", JSON.stringify({ metodo: envioMetodo, ...(envioMetodo !== "RECOGER" ? envio : {}) }));
+    fd.set(
+      "envio",
+      JSON.stringify({
+        metodo: envioMetodo,
+        ...(envioMetodo !== "RECOGER" ? envio : {}),
+      }),
+    );
     fd.set("items", JSON.stringify(items));
     fd.set("observaciones", observaciones);
     fd.set("costoEnvio", String(costoEnvio));
@@ -217,7 +232,10 @@ export default function CheckoutPage() {
   }
 
   if (actionState.success && actionState.pedidoCodigo) {
-    const waLink = buildWhatsappLink(EMPRESA_WHATSAPP, actionState.whatsappMessage ?? "");
+    const waLink = buildWhatsappLink(
+      actionState.whatsappNumber || EMPRESA_WHATSAPP,
+      actionState.whatsappMessage ?? "",
+    );
 
     return (
       <div className="mx-auto w-full max-w-page px-4 py-10 sm:px-6 sm:py-14">
@@ -235,14 +253,18 @@ export default function CheckoutPage() {
           <Card className="mb-6 text-left">
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <span className="font-medium text-gray-500">Código del pedido</span>
+                <span className="font-medium text-gray-500">
+                  Código del pedido
+                </span>
                 <span className="font-display text-lg font-bold text-primary-600">
                   {actionState.pedidoCodigo}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-medium text-gray-500">Total</span>
-                <span className="font-semibold text-gray-900">{formatCOP(total)}</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCOP(total)}
+                </span>
               </div>
               {tiempoProduccionMax !== null && (
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -259,7 +281,11 @@ export default function CheckoutPage() {
             rel="noopener noreferrer"
             className="inline-flex"
           >
-            <Button size="lg" variant="secondary" className="!bg-green-600 hover:!bg-green-700">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="!bg-green-600 hover:!bg-green-700"
+            >
               <MessageCircle className="size-5" />
               Contactar por WhatsApp
             </Button>
@@ -294,6 +320,31 @@ export default function CheckoutPage() {
         Finalizar compra
       </h1>
 
+      {/* Indicador de progreso compacto para móvil — el stepper completo de
+          abajo se oculta en pantallas pequeñas (`hidden sm:grid`), así que
+          sin esto un usuario móvil no sabe en qué paso va ni cuántos faltan. */}
+      <div className="mb-6 sm:hidden">
+        <p className="mb-2 text-sm font-medium text-gray-700">
+          Paso {step} de {STEPS.length}: {STEPS[step - 1].label}
+        </p>
+        <div
+          className="flex gap-1.5"
+          role="progressbar"
+          aria-valuenow={step}
+          aria-valuemin={1}
+          aria-valuemax={STEPS.length}
+        >
+          {STEPS.map((s) => (
+            <span
+              key={s.id}
+              className={`h-1.5 flex-1 rounded-full ${
+                s.id <= step ? "bg-primary-500" : "bg-gray-200"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
       <ol className="mb-8 hidden grid-cols-4 gap-3 sm:grid">
         {STEPS.map((s) => {
           const Icon = s.icon;
@@ -325,10 +376,7 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           {step === 1 && (
-            <PasoCliente
-              cliente={cliente}
-              setCliente={setCliente}
-            />
+            <PasoCliente cliente={cliente} setCliente={setCliente} />
           )}
 
           {step === 2 && (
@@ -398,7 +446,10 @@ export default function CheckoutPage() {
                 <ArrowRight className="size-4" />
               </Button>
             ) : (
-              <Button onClick={() => formRef.current?.requestSubmit()} loading={isPending}>
+              <Button
+                onClick={() => formRef.current?.requestSubmit()}
+                loading={isPending}
+              >
                 Confirmar pedido
               </Button>
             )}
@@ -442,7 +493,9 @@ function PasoCliente({
           placeholder="Ej: Ana María Gómez"
           {...register("nombreCompleto")}
           defaultValue={cliente.nombreCompleto}
-          onChange={(e) => setCliente({ ...cliente, nombreCompleto: e.target.value })}
+          onChange={(e) =>
+            setCliente({ ...cliente, nombreCompleto: e.target.value })
+          }
           error={formState.errors.nombreCompleto?.message}
         />
         <Input
@@ -477,7 +530,9 @@ function PasoCliente({
             placeholder="Si es un pedido corporativo"
             {...register("empresa")}
             defaultValue={cliente.empresa}
-            onChange={(e) => setCliente({ ...cliente, empresa: e.target.value })}
+            onChange={(e) =>
+              setCliente({ ...cliente, empresa: e.target.value })
+            }
             error={formState.errors.empresa?.message}
           />
         </div>
@@ -505,7 +560,9 @@ function PasoPedido({
   removeArchivo: (i: number) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   confirmacionesPers: Record<string, boolean>;
-  setConfirmacionesPers: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setConfirmacionesPers: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
 }) {
   return (
     <div className="space-y-6">
@@ -525,16 +582,19 @@ function PasoPedido({
               >
                 <div className="flex items-start gap-3">
                   {item.imagenUrl && (
-                    <img
+                    <Image
                       src={item.imagenUrl}
                       alt={item.nombre}
+                      width={64}
+                      height={64}
                       className="size-16 shrink-0 rounded-md object-cover"
                     />
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-gray-900">{item.nombre}</p>
                     <p className="text-sm text-gray-500">
-                      Cantidad: {item.cantidad} · {formatCOP(item.precioUnitario)} c/u
+                      Cantidad: {item.cantidad} ·{" "}
+                      {formatCOP(item.precioUnitario)} c/u
                     </p>
                     {item.opciones.length > 0 && (
                       <ul className="mt-1.5 text-xs text-gray-600">
@@ -547,7 +607,8 @@ function PasoPedido({
                       <ul className="mt-1.5 text-xs text-gray-600">
                         {item.personalizaciones.map((p) => (
                           <li key={p.personalizacionId}>
-                            · {p.nombre}: <span className="font-medium">{p.valor}</span>
+                            · {p.nombre}:{" "}
+                            <span className="font-medium">{p.valor}</span>
                           </li>
                         ))}
                       </ul>
@@ -687,7 +748,9 @@ function PasoEnvio({
             >
               <div
                 className={`flex size-10 shrink-0 items-center justify-center rounded-md ${
-                  selected ? "bg-primary-500 text-white" : "bg-gray-100 text-gray-600"
+                  selected
+                    ? "bg-primary-500 text-white"
+                    : "bg-gray-100 text-gray-600"
                 }`}
               >
                 <Icon className="size-5" />
@@ -695,8 +758,10 @@ function PasoEnvio({
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-gray-900">{opt.label}</p>
                 <p className="text-sm text-gray-500">
-                  {opt.value === "RECOGER" && "Retira gratis en nuestra tienda."}
-                  {opt.value === "DOMICILIO" && "Entregamos en la dirección que indiques."}
+                  {opt.value === "RECOGER" &&
+                    "Retira gratis en nuestra tienda."}
+                  {opt.value === "DOMICILIO" &&
+                    "Entregamos en la dirección que indiques."}
                   {opt.value === "TRANSPORTADORA" &&
                     "Envío nacional a cualquier ciudad (requiere documento)."}
                 </p>
@@ -716,14 +781,18 @@ function PasoEnvio({
               label="Dirección completa *"
               placeholder="Calle, carrera, número, barrio, edificio/apt"
               value={envio.direccion}
-              onChange={(e) => setEnvio({ ...envio, direccion: e.target.value })}
+              onChange={(e) =>
+                setEnvio({ ...envio, direccion: e.target.value })
+              }
             />
           </div>
           <Input
             label="Nombre del destinatario *"
             placeholder="Quién recibe el pedido"
             value={envio.destinatario}
-            onChange={(e) => setEnvio({ ...envio, destinatario: e.target.value })}
+            onChange={(e) =>
+              setEnvio({ ...envio, destinatario: e.target.value })
+            }
           />
           <Input
             label="Teléfono de contacto *"
@@ -737,7 +806,9 @@ function PasoEnvio({
                 label="Número de documento (CC / NIT) *"
                 placeholder="Requerido por transportadora"
                 value={envio.documento}
-                onChange={(e) => setEnvio({ ...envio, documento: e.target.value })}
+                onChange={(e) =>
+                  setEnvio({ ...envio, documento: e.target.value })
+                }
               />
             </div>
           )}
@@ -795,7 +866,9 @@ function PasoConfirmacion({
           <SeccionResumen title="Cliente" icon={<User className="size-4" />}>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5">
               <dt className="text-gray-500">Nombre</dt>
-              <dd className="font-medium text-gray-900">{cliente.nombreCompleto}</dd>
+              <dd className="font-medium text-gray-900">
+                {cliente.nombreCompleto}
+              </dd>
               <dt className="text-gray-500">WhatsApp</dt>
               <dd className="font-medium text-gray-900">{cliente.whatsapp}</dd>
               <dt className="text-gray-500">Ciudad</dt>
@@ -805,13 +878,18 @@ function PasoConfirmacion({
               {cliente.empresa && (
                 <>
                   <dt className="text-gray-500">Empresa</dt>
-                  <dd className="font-medium text-gray-900">{cliente.empresa}</dd>
+                  <dd className="font-medium text-gray-900">
+                    {cliente.empresa}
+                  </dd>
                 </>
               )}
             </dl>
           </SeccionResumen>
 
-          <SeccionResumen title="Productos" icon={<ShoppingBag className="size-4" />}>
+          <SeccionResumen
+            title="Productos"
+            icon={<ShoppingBag className="size-4" />}
+          >
             <ul className="space-y-3">
               {items.map((item) => (
                 <li
@@ -819,9 +897,11 @@ function PasoConfirmacion({
                   className="flex items-start gap-3 rounded-md bg-gray-50 p-3"
                 >
                   {item.imagenUrl && (
-                    <img
+                    <Image
                       src={item.imagenUrl}
                       alt={item.nombre}
+                      width={56}
+                      height={56}
                       className="size-14 shrink-0 rounded object-cover"
                     />
                   )}
@@ -875,9 +955,14 @@ function PasoConfirmacion({
           </SeccionResumen>
 
           {(observaciones || archivos.length > 0) && (
-            <SeccionResumen title="Notas y archivos" icon={<FileUp className="size-4" />}>
+            <SeccionResumen
+              title="Notas y archivos"
+              icon={<FileUp className="size-4" />}
+            >
               {observaciones && (
-                <p className="whitespace-pre-wrap text-gray-700">{observaciones}</p>
+                <p className="whitespace-pre-wrap text-gray-700">
+                  {observaciones}
+                </p>
               )}
               {archivos.length > 0 && (
                 <ul className="mt-2 space-y-1 text-xs text-gray-600">
@@ -892,7 +977,9 @@ function PasoConfirmacion({
           <div className="rounded-lg border border-primary-100 bg-primary-50/50 p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium text-gray-900">{formatCOP(subtotal)}</span>
+              <span className="font-medium text-gray-900">
+                {formatCOP(subtotal)}
+              </span>
             </div>
             <div className="mt-1 flex items-center justify-between text-sm">
               <span className="text-gray-600">Envío</span>
@@ -970,9 +1057,11 @@ function ResumenLateral({
           {items.map((i) => (
             <div key={i.id} className="flex items-center gap-2.5 text-xs">
               {i.imagenUrl && (
-                <img
+                <Image
                   src={i.imagenUrl}
                   alt={i.nombre}
+                  width={40}
+                  height={40}
                   className="size-10 shrink-0 rounded object-cover"
                 />
               )}
@@ -990,7 +1079,9 @@ function ResumenLateral({
         <div className="space-y-2 border-t border-gray-100 pt-3 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Subtotal</span>
-            <span className="font-medium text-gray-900">{formatCOP(subtotal)}</span>
+            <span className="font-medium text-gray-900">
+              {formatCOP(subtotal)}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Envío</span>

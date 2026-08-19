@@ -1,18 +1,33 @@
+import type { Metadata } from "next";
 import { PackageSearch } from "lucide-react";
 import { CatalogFilters } from "@/src/frontend/modules/public/components/CatalogFilters";
 import { CatalogPagination } from "@/src/frontend/modules/public/components/CatalogPagination";
-import { ProductCard, type ProductCardDTO } from "@/src/frontend/modules/public/components/ProductCard";
+import {
+  ProductCard,
+  type ProductCardDTO,
+} from "@/src/frontend/modules/public/components/ProductCard";
 import { mapProductCard } from "@/src/frontend/modules/public/lib/mapProductCard";
 import { EmptyState } from "@/src/frontend/components/ui/EmptyState";
 import { getCatalogProducts } from "@/src/backend/modules/productos/services/public-catalog.service";
 import { getPublicCategories } from "@/src/backend/modules/categorias/services/category.service";
+
+export const metadata: Metadata = {
+  title: "Catálogo",
+  description:
+    "Explora camisetas, tazas, termos y más productos personalizados. Filtra por categoría y encuentra el regalo perfecto.",
+};
 
 type Categoria = Awaited<ReturnType<typeof getPublicCategories>>[number];
 type ProductoCatalogo = Awaited<
   ReturnType<typeof getCatalogProducts>
 >["items"][number];
 
-const ORDEN_VALIDOS = ["precio_asc", "precio_desc", "recientes", "vendidos"] as const;
+const ORDEN_VALIDOS = [
+  "precio_asc",
+  "precio_desc",
+  "recientes",
+  "vendidos",
+] as const;
 
 export default async function CatalogoPage({
   searchParams,
@@ -74,7 +89,10 @@ export default async function CatalogoPage({
           </div>
 
           <div className="mt-8">
-            <CatalogPagination page={resultado.page} totalPages={resultado.totalPages} />
+            <CatalogPagination
+              page={resultado.page}
+              totalPages={resultado.totalPages}
+            />
           </div>
         </>
       )}

@@ -1,7 +1,7 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { getSessionUser } from "../../auth/lib/session";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 import {
   ListarPedidosSchema,
   CambiarEstadoSchema,
@@ -16,8 +16,10 @@ import {
   registrarPago,
   actualizarGuiaEnvio,
   obtenerDetalleSeguimientoPublico,
+  listarEnvios,
 } from "../services/pedido.service";
 import { AppError, toErrorMessage } from "@/src/shared/lib/errors";
+import { safeHttpUrl } from "@/src/shared/lib/safe-url";
 
 export type ListadoPedidosState = {
   success: boolean;
@@ -44,10 +46,7 @@ const initialAction: ActionState = { success: false };
 export async function listarPedidosAction(
   filtros: Record<string, FormDataEntryValue | null> = {},
 ): Promise<ListadoPedidosState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  await requireAdmin(PERMISOS.PEDIDOS_GESTIONAR);
   const fd = new FormData();
   Object.entries(filtros).forEach(([k, v]) => {
     if (v !== null && v !== undefined) fd.append(k, String(v));
@@ -70,10 +69,7 @@ export async function listarPedidosAction(
 export async function obtenerDetallePedidoAction(
   id: string,
 ): Promise<DetallePedidoState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  await requireAdmin(PERMISOS.PEDIDOS_GESTIONAR);
   try {
     const data = await obtenerDetallePedido(id);
     return { success: true, data };
@@ -87,10 +83,7 @@ export async function cambiarEstadoPedidoAction(
   prevState: ActionState = initialAction,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  const user = await requireAdmin(PERMISOS.PEDIDOS_GESTIONAR);
   const parsed = CambiarEstadoSchema.safeParse({
     pedidoId: formData.get("pedidoId"),
     estado: formData.get("estado"),
@@ -123,10 +116,7 @@ export async function agregarComentarioAction(
   prevState: ActionState = initialAction,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  const user = await requireAdmin(PERMISOS.PEDIDOS_GESTIONAR);
   const parsed = ComentarioInternoSchema.safeParse({
     pedidoId: formData.get("pedidoId"),
     descripcion: formData.get("descripcion"),
@@ -154,12 +144,10 @@ export async function registrarPagoAction(
   prevState: ActionState = initialAction,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  const user = await requireAdmin(PERMISOS.PAGOS_GESTIONAR);
   const pedidoId = String(formData.get("pedidoId") ?? "");
-  const tipo = String(formData.get("tipo") ?? "ABONO") as "ANTICIPO" | "ABONO" | "PAGO_FINAL";
+  const tipo = String(formData.get("tipo") ?? "ABONO") as
+    "ANTICIPO" | "ABONO" | "PAGO_FINAL";
   const monto = Number(formData.get("monto") ?? 0);
   const metodo = String(formData.get("metodo") ?? "Transferencia");
 
@@ -175,7 +163,10 @@ export async function registrarPagoAction(
       metodo,
       usuarioId: user.sub,
     });
-    return { success: true, message: `Pago de $${monto.toLocaleString("es-CO")} registrado exitosamente.` };
+    return {
+      success: true,
+      message: `Pago de $${monto.toLocaleString("es-CO")} registrado exitosamente.`,
+    };
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
     return { success: false, error: toErrorMessage(e) };
@@ -186,17 +177,28 @@ export async function actualizarEnvioAction(
   prevState: ActionState = initialAction,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await getSessionUser();
-  if (!user) {
-    redirect("/admin/login");
-  }
+  const user = await requireAdmin(PERMISOS.ENVIOS_GESTIONAR);
   const pedidoId = String(formData.get("pedidoId") ?? "");
   const numeroGuia = String(formData.get("numeroGuia") ?? "");
-  const estadoGuia = (formData.get("estadoGuia") as any) || "GENERADA";
-  const enlaceRastreo = String(formData.get("enlaceRastreo") ?? "");
+  const estadoGuia =
+    (formData.get("estadoGuia") as
+      "GENERADA" | "EN_TRANSITO" | "ENTREGADA" | "DEVUELTA" | null) ||
+    "GENERADA";
+  const enlaceRastreo = String(formData.get("enlaceRastreo") ?? "").trim();
 
   if (!pedidoId || !numeroGuia.trim()) {
     return { success: false, error: "El número de guía es obligatorio." };
+  }
+
+  if (enlaceRastreo) {
+    const validacion = safeHttpUrl.safeParse(enlaceRastreo);
+    if (!validacion.success) {
+      return {
+        success: false,
+        error:
+          "El enlace de rastreo debe ser una URL http:// o https:// válida.",
+      };
+    }
   }
 
   try {
@@ -204,10 +206,13 @@ export async function actualizarEnvioAction(
       pedidoId,
       numeroGuia,
       estadoGuia,
-      enlaceRastreo: enlaceRastreo.trim() || undefined,
+      enlaceRastreo: enlaceRastreo || undefined,
       usuarioId: user.sub,
     });
-    return { success: true, message: `Guía ${numeroGuia} guardada correctamente.` };
+    return {
+      success: true,
+      message: `Guía ${numeroGuia} guardada correctamente.`,
+    };
   } catch (e) {
     if (e instanceof AppError) return { success: false, error: e.message };
     return { success: false, error: toErrorMessage(e) };
@@ -224,3 +229,7 @@ export async function obtenerSeguimientoPublicoAction(token: string) {
   }
 }
 
+export async function listarEnviosAction(limit = 50) {
+  await requireAdmin(PERMISOS.ENVIOS_GESTIONAR);
+  return listarEnvios(limit);
+}

@@ -10,6 +10,8 @@ import {
   getOptionalFile,
   uploadCatalogImage,
 } from "@/src/backend/shared/uploadEntityImage";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export type ProductFormState = {
   success: boolean;
@@ -39,6 +41,8 @@ export async function createProductAction(
   prevState: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const seoImagenFile = getOptionalFile(formData, "seoImagenArchivo");
 
   const result = ProductSchema.safeParse(parseFormData(formData));

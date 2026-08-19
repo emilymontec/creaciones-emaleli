@@ -59,7 +59,10 @@ import {
   TIPO_PAGO_LABEL,
 } from "@/src/backend/modules/pagos/schemas/pago.schema";
 import { useToast } from "@/src/frontend/providers/ToastProvider";
-import type { EstadoPedido, TipoEventoTimeline } from "@/generated/prisma/client";
+import type {
+  EstadoPedido,
+  TipoEventoTimeline,
+} from "@/generated/prisma/client";
 import { ProduccionSection } from "./ProduccionSection";
 
 const TIPO_ICON: Record<string, LucideIcon> = {
@@ -156,7 +159,10 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
 
   useEffect(() => {
     if (comentState.success) {
-      toast({ title: comentState.message ?? "Comentario agregado", variant: "success" });
+      toast({
+        title: comentState.message ?? "Comentario agregado",
+        variant: "success",
+      });
       // Limpia el campo local al reaccionar al resultado de la Server Action.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setComentario("");
@@ -176,7 +182,10 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
 
   useEffect(() => {
     if (pagoState.success) {
-      toast({ title: pagoState.message ?? "Pago registrado", variant: "success" });
+      toast({
+        title: pagoState.message ?? "Pago registrado",
+        variant: "success",
+      });
       // Cierra el modal y limpia la vista previa al reaccionar al resultado.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPagoModalOpen(false);
@@ -186,7 +195,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
         setDetalle(res);
       });
     } else if (pagoState.error) {
-      toast({ title: "Error en pago", description: pagoState.error, variant: "error" });
+      toast({
+        title: "Error en pago",
+        description: pagoState.error,
+        variant: "error",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagoState]);
@@ -217,7 +230,10 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
 
   useEffect(() => {
     if (envioState.success) {
-      toast({ title: envioState.message ?? "Guía de envío guardada", variant: "success" });
+      toast({
+        title: envioState.message ?? "Guía de envío guardada",
+        variant: "success",
+      });
       // Cierra el modal al reaccionar al resultado de la Server Action.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setEnvioModalOpen(false);
@@ -226,7 +242,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
         setDetalle(res);
       });
     } else if (envioState.error) {
-      toast({ title: "Error en guía de envío", description: envioState.error, variant: "error" });
+      toast({
+        title: "Error en guía de envío",
+        description: envioState.error,
+        variant: "error",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envioState]);
@@ -304,8 +324,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             </Badge>
           </div>
           <p className="mt-1 text-sm text-gray-500">
-            {totalItems} {totalItems === 1 ? "producto" : "productos"} · Método de
-            envío: {p.metodoEnvio}
+            {totalItems} {totalItems === 1 ? "producto" : "productos"} · Método
+            de envío: {p.metodoEnvio}
           </p>
           <div className="mt-3 h-1 w-14 rounded-pill bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500" />
         </div>
@@ -411,9 +431,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                   Productos del pedido
                 </div>
               }
-              action={
-                <Badge variant="neutral">{totalItems} unidades</Badge>
-              }
+              action={<Badge variant="neutral">{totalItems} unidades</Badge>}
             />
             <div className="overflow-hidden rounded-input border border-gray-100">
               <table className="w-full text-sm">
@@ -548,7 +566,9 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-gray-900">
-                            {TIPO_PAGO_LABEL[pago.tipo as keyof typeof TIPO_PAGO_LABEL] ?? pago.tipo}
+                            {TIPO_PAGO_LABEL[
+                              pago.tipo as keyof typeof TIPO_PAGO_LABEL
+                            ] ?? pago.tipo}
                             <span className="ml-2 text-xs font-normal text-gray-500">
                               · {pago.metodo}
                             </span>
@@ -596,7 +616,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 </div>
               }
               action={
-                <Button size="sm" variant="secondary" onClick={() => setFacturaModalOpen(true)}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setFacturaModalOpen(true)}
+                >
                   Gestionar
                 </Button>
               }
@@ -617,14 +641,20 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 {p.factura.numero && (
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium text-gray-500">Número</p>
-                    <p className="font-mono font-semibold text-gray-900">{p.factura.numero}</p>
+                    <p className="font-mono font-semibold text-gray-900">
+                      {p.factura.numero}
+                    </p>
                   </div>
                 )}
                 {p.factura.fechaEmision && (
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium text-gray-500">Fecha emisión</p>
+                    <p className="text-xs font-medium text-gray-500">
+                      Fecha emisión
+                    </p>
                     <p className="text-gray-800">
-                      {new Date(p.factura.fechaEmision).toLocaleDateString("es-CO")}
+                      {new Date(p.factura.fechaEmision).toLocaleDateString(
+                        "es-CO",
+                      )}
                     </p>
                   </div>
                 )}
@@ -638,7 +668,9 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                     <div className="flex items-center gap-2">
                       <FileText className="size-4 text-primary-600" />
                       <p className="text-sm font-semibold text-primary-800">
-                        {p.factura.numero ? `Factura ${p.factura.numero}.pdf` : "Factura PDF"}
+                        {p.factura.numero
+                          ? `Factura ${p.factura.numero}.pdf`
+                          : "Factura PDF"}
                       </p>
                     </div>
                     <Download className="size-4 text-primary-700" />
@@ -646,8 +678,12 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 )}
                 {p.factura.notas && (
                   <div className="rounded-input bg-gray-50 p-2">
-                    <p className="text-xs font-semibold text-gray-500 mb-1">Notas</p>
-                    <p className="text-xs text-gray-700 whitespace-pre-wrap">{p.factura.notas}</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-1">
+                      Notas
+                    </p>
+                    <p className="text-xs text-gray-700 whitespace-pre-wrap">
+                      {p.factura.notas}
+                    </p>
                   </div>
                 )}
                 {p.factura.usuario?.nombre && (
@@ -698,7 +734,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                         {a.nombre || "Archivo adjunto"}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {a.tipo} · {a.origen === "CLIENTE" ? "Cliente" : "Producción"}
+                        {a.tipo} ·{" "}
+                        {a.origen === "CLIENTE" ? "Cliente" : "Producción"}
                       </p>
                     </div>
                   </a>
@@ -718,7 +755,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                 </div>
               }
               action={
-                <Button size="sm" variant="secondary" onClick={() => setEnvioModalOpen(true)}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setEnvioModalOpen(true)}
+                >
                   Gestionar Guía
                 </Button>
               }
@@ -744,6 +785,75 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                       <p className="font-mono text-sm text-gray-900 font-bold">
                         {p.envios[0].numeroGuia}
                       </p>
+                    </div>
+                  )}
+                  {p.envios[0].estadoGuia && (
+                    <div>
+                      <p className="text-xs font-medium text-gray-500">
+                        Estado de la guía
+                      </p>
+                      <Badge
+                        variant={
+                          p.envios[0].estadoGuia === "ENTREGADA"
+                            ? "success"
+                            : p.envios[0].estadoGuia === "DEVUELTA"
+                              ? "error"
+                              : p.envios[0].estadoGuia === "EN_TRANSITO"
+                                ? "info"
+                                : "neutral"
+                        }
+                      >
+                        {p.envios[0].estadoGuia === "GENERADA"
+                          ? "Generada / Lista"
+                          : p.envios[0].estadoGuia === "EN_TRANSITO"
+                            ? "En tránsito"
+                            : p.envios[0].estadoGuia === "ENTREGADA"
+                              ? "Entregada"
+                              : "Devuelta"}
+                      </Badge>
+                    </div>
+                  )}
+                  {p.envios[0].enlaceRastreo && (
+                    <div>
+                      <p className="text-xs font-medium text-gray-500">
+                        Rastreo
+                      </p>
+                      <a
+                        href={p.envios[0].enlaceRastreo}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-primary-600 hover:underline"
+                      >
+                        Ver en la transportadora
+                      </a>
+                    </div>
+                  )}
+                  {(p.envios[0].fechaDespacho || p.envios[0].fechaEntrega) && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {p.envios[0].fechaDespacho && (
+                        <div>
+                          <p className="text-xs font-medium text-gray-500">
+                            Despacho
+                          </p>
+                          <p className="text-gray-800">
+                            {new Date(
+                              p.envios[0].fechaDespacho,
+                            ).toLocaleDateString("es-CO")}
+                          </p>
+                        </div>
+                      )}
+                      {p.envios[0].fechaEntrega && (
+                        <div>
+                          <p className="text-xs font-medium text-gray-500">
+                            Entrega
+                          </p>
+                          <p className="text-gray-800">
+                            {new Date(
+                              p.envios[0].fechaEntrega,
+                            ).toLocaleDateString("es-CO")}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div>
@@ -851,9 +961,7 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
                           {TIPO_EVENTO_LABEL[ev.tipo] ?? ev.tipo}
                         </p>
                         {ev.estadoNuevo && (
-                          <EstadoPedidoBadge
-                            estado={ev.estadoNuevo}
-                          />
+                          <EstadoPedidoBadge estado={ev.estadoNuevo} />
                         )}
                       </div>
                       {ev.descripcion && (
@@ -884,7 +992,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
         title="Registrar Pago"
         description={`Saldo pendiente actual: $${Number(p.saldoPendiente).toLocaleString("es-CO")}`}
       >
-        <form action={pagoDispatch} className="space-y-4" encType="multipart/form-data">
+        <form
+          action={pagoDispatch}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           <input type="hidden" name="pedidoId" value={p.id} />
           <div className="space-y-2">
             <Select
@@ -900,7 +1012,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             />
             <p className="text-xs text-gray-500">
               <AlertTriangle className="size-3 inline align-text-bottom mr-1 text-amber-500" />
-              <strong>Pago final</strong> valida que el monto coincida exactamente con el saldo pendiente.
+              <strong>Pago final</strong> valida que el monto coincida
+              exactamente con el saldo pendiente.
             </p>
           </div>
           <Input
@@ -909,7 +1022,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             type="number"
             step="1"
             min={0.01}
-            defaultValue={Number(p.saldoPendiente) > 0 ? Number(p.saldoPendiente) : undefined}
+            defaultValue={
+              Number(p.saldoPendiente) > 0
+                ? Number(p.saldoPendiente)
+                : undefined
+            }
             placeholder="0"
             required
             error={pagoState.errors?.monto?.[0]}
@@ -919,11 +1036,17 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             label="Método de pago"
             defaultValue="Transferencia Bancaria"
             options={[
-              { value: "Transferencia Bancaria", label: "Transferencia Bancaria" },
+              {
+                value: "Transferencia Bancaria",
+                label: "Transferencia Bancaria",
+              },
               { value: "Nequi", label: "Nequi" },
               { value: "Daviplata", label: "Daviplata" },
               { value: "Efectivo", label: "Efectivo" },
-              { value: "Tarjeta Débito/Crédito", label: "Tarjeta Débito / Crédito" },
+              {
+                value: "Tarjeta Débito/Crédito",
+                label: "Tarjeta Débito / Crédito",
+              },
               { value: "Cheque", label: "Cheque" },
             ]}
             error={pagoState.errors?.metodo?.[0]}
@@ -953,7 +1076,9 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
               <Upload className="size-5 text-gray-400" />
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-700">
-                  {comprobantePreview ? comprobantePreview.name : "Subir comprobante"}
+                  {comprobantePreview
+                    ? comprobantePreview.name
+                    : "Subir comprobante"}
                 </p>
                 <p className="text-xs text-gray-500">
                   Máximo 5 MB · JPG, PNG, WebP o PDF
@@ -979,12 +1104,20 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
           </div>
           {pagoState.error && (
             <div className="rounded-input bg-red-50 p-3 border border-red-200">
-              <p className="text-xs font-semibold text-red-800">No se pudo registrar el pago</p>
-              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">{pagoState.error}</p>
+              <p className="text-xs font-semibold text-red-800">
+                No se pudo registrar el pago
+              </p>
+              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">
+                {pagoState.error}
+              </p>
             </div>
           )}
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" onClick={() => setPagoModalOpen(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setPagoModalOpen(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" loading={pagoPending}>
@@ -1028,7 +1161,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             placeholder="https://transportadora.com/rastreo?guia=..."
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" onClick={() => setEnvioModalOpen(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setEnvioModalOpen(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" loading={envioPending}>
@@ -1048,7 +1185,11 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
         title="Gestionar Facturación"
         description={`Facturación del pedido ${p.codigo} · Total: $${Number(p.total).toLocaleString("es-CO")}`}
       >
-        <form action={facturaDispatch} className="space-y-4" encType="multipart/form-data">
+        <form
+          action={facturaDispatch}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           <input type="hidden" name="pedidoId" value={p.id} />
           <Select
             name="estado"
@@ -1076,11 +1217,13 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
               <Upload className="size-5 text-gray-400" />
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-700">
-                  {facturaPdfPreview ? facturaPdfPreview.name : p.factura?.urlPdf ? "Reemplazar PDF existente" : "Subir factura PDF"}
+                  {facturaPdfPreview
+                    ? facturaPdfPreview.name
+                    : p.factura?.urlPdf
+                      ? "Reemplazar PDF existente"
+                      : "Subir factura PDF"}
                 </p>
-                <p className="text-xs text-gray-500">
-                  Máximo 10 MB · solo PDF
-                </p>
+                <p className="text-xs text-gray-500">Máximo 10 MB · solo PDF</p>
               </div>
               <input
                 type="file"
@@ -1101,7 +1244,8 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
             )}
             {!facturaPdfPreview && p.factura?.urlPdf && (
               <p className="mt-1 text-xs text-gray-500">
-                Ya hay un PDF cargado. Si no seleccionas uno nuevo, se conservará el actual.
+                Ya hay un PDF cargado. Si no seleccionas uno nuevo, se
+                conservará el actual.
               </p>
             )}
           </div>
@@ -1115,12 +1259,20 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
           />
           {facturaState.error && (
             <div className="rounded-input bg-red-50 p-3 border border-red-200">
-              <p className="text-xs font-semibold text-red-800">No se pudo actualizar la factura</p>
-              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">{facturaState.error}</p>
+              <p className="text-xs font-semibold text-red-800">
+                No se pudo actualizar la factura
+              </p>
+              <p className="text-xs text-red-700 mt-0.5 whitespace-pre-wrap">
+                {facturaState.error}
+              </p>
             </div>
           )}
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" onClick={() => setFacturaModalOpen(false)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setFacturaModalOpen(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" loading={facturaPending}>
@@ -1134,4 +1286,3 @@ export function PedidoDetallePage({ pedidoId }: { pedidoId: string }) {
     </div>
   );
 }
-

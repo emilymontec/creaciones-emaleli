@@ -1,0 +1,20 @@
+# Vercel ya excluye node_modules, .git y .next por defecto; aquí se listan
+# extras específicos de este proyecto que no deben subirse al build.
+
+# Cliente de Prisma generado (se regenera en el build vía `postinstall`)
+generated/
+
+# Documentación y artefactos de desarrollo que no aportan al runtime
+docs/
+AUDITORIA-2026-08.md
+ROADMAP.md
+.agents/
+skills-lock.json
+
+# Archivos locales de entorno (nunca deben llegar al repo/deploy;
+# las variables reales se configuran en el dashboard de Vercel)
+.env
+.env.local
+.env.*.local
+
+tsconfig.tsbuildinfo

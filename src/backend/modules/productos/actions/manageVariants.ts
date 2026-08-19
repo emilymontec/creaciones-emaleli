@@ -9,6 +9,8 @@ import {
 } from "../schemas/variant.schema";
 import { toErrorMessage } from "@/src/shared/lib/errors";
 import { uploadCatalogImage } from "@/src/backend/shared/uploadEntityImage";
+import { requireAdmin } from "@/src/backend/shared/require-admin";
+import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export type ActionResult = { success: boolean; message?: string };
 
@@ -23,6 +25,8 @@ export async function createOpcionAction(input: {
   precioExtra: number;
   imagen?: File;
 }): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const result = VariantOpcionSchema.safeParse(input);
   if (!result.success) {
     return {
@@ -58,6 +62,8 @@ export async function updateOpcionAction(
   id: string,
   input: { nombre: string; precioExtra: number; imagen?: File },
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     const imagen =
       input.imagen && input.imagen.size > 0
@@ -81,6 +87,8 @@ export async function toggleOpcionActivoAction(
   productoId: string,
   id: string,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await variantService.toggleOpcionActivo(id);
     revalidate(productoId);
@@ -94,6 +102,8 @@ export async function deleteOpcionAction(
   productoId: string,
   id: string,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await variantService.deleteOpcion(id);
     revalidate(productoId);
@@ -107,6 +117,8 @@ export async function generateCombinacionesAction(
   productoId: string,
   gruposOpcionIds: string[][],
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await variantService.generateCombinaciones(productoId, gruposOpcionIds);
     revalidate(productoId);
@@ -121,6 +133,8 @@ export async function updateCombinacionAction(
   id: string,
   input: unknown,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   const result = CombinacionUpdateSchema.safeParse(input);
   if (!result.success) {
     return {
@@ -147,6 +161,8 @@ export async function deleteCombinacionAction(
   productoId: string,
   id: string,
 ): Promise<ActionResult> {
+  await requireAdmin(PERMISOS.CATALOGO_GESTIONAR);
+
   try {
     await variantService.deleteCombinacion(id);
     revalidate(productoId);
