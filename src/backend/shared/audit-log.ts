@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/src/backend/shared/prisma";
 import { logger } from "@/src/shared/lib/logger";
 
