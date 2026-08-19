@@ -6,9 +6,6 @@
   "functions": {
     "src/app/**/*.{ts,tsx}": {
       "maxDuration": 60
-    },
-    "src/proxy.ts": {
-      "maxDuration": 60
     }
   }
 }
