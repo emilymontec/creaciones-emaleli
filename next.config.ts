@@ -5,17 +5,29 @@ const withBundleAnalyzer = createBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+const isDev = process.env.NODE_ENV !== "production";
+
+const scriptSrc = ["'self'", "'unsafe-inline'"];
+if (isDev) {
+  scriptSrc.push("'unsafe-eval'");
+}
+
+const connectSrc = [
+  "'self'",
+  "https://*.supabase.co",
+  "https://api.whatsapp.com",
+];
+if (isDev) {
+  connectSrc.push("ws:", "wss:");
+}
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  // 'unsafe-inline' en script-src es necesario por los scripts de
-  // hidratación/inline que inyecta Next.js; 'unsafe-eval' se evita.
-  "script-src 'self' 'unsafe-inline'",
+  `script-src ${scriptSrc.join(" ")}`,
   "style-src 'self' 'unsafe-inline'",
-  // Imágenes propias, de Supabase Storage y data: URIs (placeholders/blur).
   "img-src 'self' data: blob: https://*.supabase.co",
   "font-src 'self' data:",
-  // Llamadas de cliente a Supabase (auth/storage) y WhatsApp.
-  "connect-src 'self' https://*.supabase.co https://api.whatsapp.com",
+  `connect-src ${connectSrc.join(" ")}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -49,10 +61,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Las subidas de avances de producción (fotos/videos) y archivos de
-  // pedidos viajan por server actions. En Vercel el body de las funciones
-  // está limitado a 4.5 MB (Hobby) — aquí se alinea con el máximo de
-  // storage (50 MB) para que funcione donde la plataforma lo permita.
   experimental: {
     serverActions: {
       bodySizeLimit: "50mb",
@@ -61,8 +69,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Se aplica a toda la app; HSTS solo tiene efecto real cuando se
-        // sirve por HTTPS (Vercel siempre lo hace en producción).
         source: "/:path*",
         headers: securityHeaders,
       },
