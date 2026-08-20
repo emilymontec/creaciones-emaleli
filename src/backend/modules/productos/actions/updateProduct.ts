@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { randomUUID } from "node:crypto";
 import { ProductUpdateSchema } from "../schemas/product.schema";
 import { updateProduct } from "../services/product.service";
-import { ensurePrincipalFromSeo } from "../services/gallery.service";
+import { ensurePrincipalFromSeo, addImagen } from "../services/gallery.service";
 import { toErrorMessage } from "@/src/shared/lib/errors";
 import {
   getOptionalFile,
@@ -57,6 +58,18 @@ export async function updateProductAction(
 
     if (seoImagen) {
       await ensurePrincipalFromSeo(result.data.id, seoImagen);
+    }
+
+    const galeriaFiles = formData
+      .getAll("galeriaArchivos")
+      .filter((f): f is File => f instanceof File && f.size > 0);
+
+    for (const file of galeriaFiles) {
+      const url = await uploadCatalogImage(
+        `producto-${result.data.id}-${randomUUID()}`,
+        file,
+      );
+      await addImagen(result.data.id, url);
     }
 
     revalidatePath("/admin/productos");

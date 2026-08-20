@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
 import { ProductSchema } from "../schemas/product.schema";
 import { createProduct } from "../services/product.service";
-import { ensurePrincipalFromSeo } from "../services/gallery.service";
+import { ensurePrincipalFromSeo, addImagen } from "../services/gallery.service";
 import { toErrorMessage } from "@/src/shared/lib/errors";
 import {
   getOptionalFile,
@@ -63,6 +63,18 @@ export async function createProductAction(
 
     if (seoImagen) {
       await ensurePrincipalFromSeo(producto.id, seoImagen);
+    }
+
+    const galeriaFiles = formData
+      .getAll("galeriaArchivos")
+      .filter((f): f is File => f instanceof File && f.size > 0);
+
+    for (const file of galeriaFiles) {
+      const url = await uploadCatalogImage(
+        `producto-${producto.id}-${randomUUID()}`,
+        file,
+      );
+      await addImagen(producto.id, url);
     }
 
     revalidatePath("/admin/productos");

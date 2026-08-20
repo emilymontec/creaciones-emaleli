@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { ImagePlus, X } from "lucide-react";
 import {
   createProductAction,
@@ -31,7 +37,7 @@ export interface ProductDTO {
   seoDescripcion: string | null;
   seoImagen: string | null;
   categorias: { id: string; nombre: string }[];
-  imagenes: { url: string }[];
+  imagenes: { id: string; url: string; principal: boolean; orden: number }[];
 }
 
 const ESTADO_OPTIONS = [
@@ -54,6 +60,7 @@ export function ProductForm({
   const isEditing = Boolean(product);
   const action = isEditing ? updateProductAction : createProductAction;
   const [state, formAction, pending] = useActionState(action, initialState);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const [nombre, setNombre] = useState(product?.nombre ?? "");
@@ -66,6 +73,26 @@ export function ProductForm({
     product?.seoImagen ?? null,
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    return () => {
+      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [galleryPreviews]);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+    galleryFiles.forEach((file) => formData.append("galeriaArchivos", file));
+    startTransition(() => {
+      formAction(formData);
+    });
+  }
 
   useEffect(() => {
     if (state.success) {
@@ -89,8 +116,25 @@ export function ProductForm({
     if (!slugTouched) setSlug(slugify(value));
   }
 
+  function handleGalleryFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+    setGalleryFiles((prev) => [...prev, ...newFiles]);
+
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+  }
+
+  function removeGalleryFile(index: number) {
+    URL.revokeObjectURL(galleryPreviews[index]);
+    setGalleryFiles((prev) => prev.filter((_, i) => i !== index));
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
+
   return (
-    <form action={formAction} className="space-y-5">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
       {isEditing && <input type="hidden" name="id" value={product!.id} />}
       {isEditing && (
         <input
@@ -206,7 +250,10 @@ export function ProductForm({
         label="Categorías"
         placeholder="Selecciona una o varias categorías"
         multiple
-        options={categoriaOptions.map((c) => ({ value: c.id, label: c.nombre }))}
+        options={categoriaOptions.map((c) => ({
+          value: c.id,
+          label: c.nombre,
+        }))}
         value={categoriaIds}
         onChange={setCategoriaIds}
         error={state.errors?.categoriaIds?.[0]}
@@ -288,7 +335,95 @@ export function ProductForm({
         </div>
       </fieldset>
 
-      <Button type="submit" loading={pending} fullWidth>
+      <fieldset className="rounded-card border border-gray-100 p-4">
+        <legend className="px-1 text-sm font-semibold text-gray-700">
+          Galería de imágenes
+        </legend>
+
+        <div className="space-y-4 pt-2">
+          {isEditing && product!.imagenes.length > 0 && (
+            <div>
+              <p className="mb-2 text-xs text-gray-500">
+                Imágenes actuales ({product!.imagenes.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                {product!.imagenes.map((img) => (
+                  <div
+                    key={img.id}
+                    className="relative aspect-square overflow-hidden rounded-input border border-gray-100"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img.url}
+                      alt="Imagen del producto"
+                      className="size-full object-cover"
+                    />
+                    {img.principal && (
+                      <span className="absolute left-1 top-1 rounded-pill bg-primary-500 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                        Principal
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-gray-700">
+              {isEditing ? "Agregar más imágenes" : "Imágenes del producto"}
+            </span>
+            <p className="mb-2 text-xs text-gray-500">
+              Selecciona una o varias imágenes (máx. 10 en total). JPG, PNG o
+              WebP.
+            </p>
+            <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-button border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+              <ImagePlus className="size-3.5" />
+              Seleccionar imágenes
+              <input
+                ref={galleryInputRef}
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleGalleryFiles}
+              />
+            </label>
+          </div>
+
+          {galleryPreviews.length > 0 && (
+            <div>
+              <p className="mb-2 text-xs text-gray-500">
+                Nuevas imágenes ({galleryPreviews.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                {galleryPreviews.map((url, index) => (
+                  <div
+                    key={url}
+                    className="group relative aspect-square overflow-hidden rounded-input border border-dashed border-primary-200 bg-primary-50/30"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt={`Nueva imagen ${index + 1}`}
+                      className="size-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryFile(index)}
+                      className="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 opacity-0 transition-opacity hover:bg-red-50 hover:text-error group-hover:opacity-100"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </fieldset>
+
+      <Button type="submit" loading={pending || isPending} fullWidth>
         {isEditing ? "Guardar cambios" : "Guardar producto"}
       </Button>
     </form>

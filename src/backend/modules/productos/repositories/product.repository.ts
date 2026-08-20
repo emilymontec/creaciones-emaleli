@@ -4,8 +4,8 @@ import { Prisma } from "@/generated/prisma/client";
 const listInclude = {
   categorias: { select: { id: true, nombre: true } },
   imagenes: {
+    select: { id: true, url: true, principal: true, orden: true },
     orderBy: [{ principal: "desc" as const }, { orden: "asc" as const }],
-    take: 1,
   },
 } satisfies Prisma.ProductoInclude;
 
@@ -35,7 +35,13 @@ export async function findAll(params: FindAllProductosParams = {}) {
     prisma.producto.count(),
   ]);
 
-  return { items, total, page, perPage, pages: Math.max(1, Math.ceil(total / perPage)) };
+  return {
+    items,
+    total,
+    page,
+    perPage,
+    pages: Math.max(1, Math.ceil(total / perPage)),
+  };
 }
 
 export async function findById(id: string) {
