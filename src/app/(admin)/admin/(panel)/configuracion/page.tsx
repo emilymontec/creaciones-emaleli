@@ -10,7 +10,7 @@ import {
 } from "@/src/backend/modules/configuracion/services/configuracion.service";
 
 export const metadata: Metadata = {
-  title: "Configuración de la Tienda | Emaleli Admin",
+  title: "Configuración de la Tienda | Administrativo",
 };
 
 export default async function ConfiguracionAdminPage() {

@@ -6,7 +6,7 @@ import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { Loader } from "@/src/frontend/components/ui/Loader";
 
 export const metadata: Metadata = {
-  title: "Pedidos | Emaleli Admin",
+  title: "Pedidos | Administración",
 };
 
 export default function PedidosAdminPage() {

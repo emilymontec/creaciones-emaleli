@@ -13,7 +13,7 @@ import { StatCard } from "@/src/frontend/components/ui/StatCard";
 import { obtenerDashboardMetricas } from "@/src/backend/modules/dashboard/actions/getDashboard";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Emaleli Admin",
+  title: "Dashboard Administrativo",
 };
 
 const dateFormatter = new Intl.DateTimeFormat("es-CO", {
@@ -60,8 +60,7 @@ export default async function DashboardPage() {
       hint: "Pendiente de liquidar",
       icon: Wallet,
       href: "/admin/pagos",
-      iconClass:
-        "bg-gradient-to-br from-amber-100 to-coral-100 text-amber-600",
+      iconClass: "bg-gradient-to-br from-amber-100 to-coral-100 text-amber-600",
     },
   ];
 
@@ -82,7 +81,7 @@ export default async function DashboardPage() {
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-widest backdrop-blur">
               <LayoutDashboard className="size-3.5" />
-              Emaleli Admin
+              Creaciones Emaleli | Administración
             </span>
             <h1 className="mt-3 font-display text-2xl font-extrabold sm:text-3xl">
               Resumen de tu operación

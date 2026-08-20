@@ -4,7 +4,7 @@ import { Lock } from "lucide-react";
 import { LoginForm } from "@/src/frontend/modules/auth/components/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Iniciar sesión | Emaleli",
+  title: "Iniciar sesión | Creaciones Emaleli",
 };
 
 export default function LoginPage() {
@@ -44,7 +44,10 @@ export default function LoginPage() {
         </div>
 
         <div className="relative overflow-hidden rounded-modal border border-gray-100 bg-white p-6 shadow-elevated">
-          <div className="absolute inset-x-0 top-0 h-[3px] bg-marquee-gradient" aria-hidden />
+          <div
+            className="absolute inset-x-0 top-0 h-[3px] bg-marquee-gradient"
+            aria-hidden
+          />
           <LoginForm />
         </div>
 

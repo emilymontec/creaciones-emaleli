@@ -5,7 +5,7 @@ import { AuditoriaPanel } from "@/src/frontend/modules/auditoria/components/Audi
 import { listarAuditoriaAction } from "@/src/backend/modules/auditoria/actions/manageAuditoria";
 
 export const metadata: Metadata = {
-  title: "Auditoría | Emaleli Admin",
+  title: "Auditoría Administrativo",
 };
 
 export default async function AuditoriaAdminPage() {

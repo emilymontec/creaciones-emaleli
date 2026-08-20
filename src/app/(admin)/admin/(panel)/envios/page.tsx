@@ -3,7 +3,7 @@ import { EnviosPanel } from "@/src/frontend/modules/envios/components/EnviosPane
 import { listarEnviosAction } from "@/src/backend/modules/pedidos/actions/managePedidos";
 
 export const metadata: Metadata = {
-  title: "Gestión de Envíos y Logística | Emaleli Admin",
+  title: "Gestión de Envíos y Logística | Administración",
 };
 
 export default async function EnviosAdminPage() {

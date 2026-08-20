@@ -8,7 +8,7 @@ import { EstadoPedidoBadge } from "@/src/frontend/modules/pedidos/components/Est
 import { prisma } from "@/src/backend/shared/prisma";
 
 export const metadata: Metadata = {
-  title: "Producción y Taller | Emaleli Admin",
+  title: "Producción y Taller | Administración",
 };
 
 export default async function ProduccionAdminPage() {
@@ -37,21 +37,28 @@ export default async function ProduccionAdminPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label="En Revisión / Diseño"
-          value={pedidosProduccion.filter((p) => p.estado === "EN_REVISION").length}
+          value={
+            pedidosProduccion.filter((p) => p.estado === "EN_REVISION").length
+          }
           hint="Esperando visto bueno"
           icon={AlertCircle}
           iconClass="bg-gradient-to-br from-coral-100 to-accent-100 text-coral-600"
         />
         <StatCard
           label="Diseño Aprobado"
-          value={pedidosProduccion.filter((p) => p.estado === "DISENO_APROBADO").length}
+          value={
+            pedidosProduccion.filter((p) => p.estado === "DISENO_APROBADO")
+              .length
+          }
           hint="Listos para fabricar"
           icon={Clock}
           iconClass="bg-gradient-to-br from-sky-100 to-primary-100 text-sky-600"
         />
         <StatCard
           label="En Fabricación"
-          value={pedidosProduccion.filter((p) => p.estado === "EN_PRODUCCION").length}
+          value={
+            pedidosProduccion.filter((p) => p.estado === "EN_PRODUCCION").length
+          }
           hint="En el taller"
           icon={Factory}
           iconClass="bg-gradient-to-br from-violet-100 to-primary-100 text-violet-600"
@@ -68,7 +75,9 @@ export default async function ProduccionAdminPage() {
         {pedidosProduccion.length === 0 ? (
           <div className="flex h-48 flex-col items-center justify-center text-center p-6">
             <CheckCircle2 className="size-10 text-emerald-500 mb-2" />
-            <p className="text-sm font-semibold text-gray-800">¡Taller al día!</p>
+            <p className="text-sm font-semibold text-gray-800">
+              ¡Taller al día!
+            </p>
             <p className="text-xs text-gray-500 mt-0.5">
               No hay pedidos pendientes en etapa de diseño o fabricación.
             </p>
@@ -76,17 +85,26 @@ export default async function ProduccionAdminPage() {
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {pedidosProduccion.map((p) => (
-              <Card key={p.id} className="p-4 border border-gray-200/80 hover:border-primary-300 transition-colors">
+              <Card
+                key={p.id}
+                className="p-4 border border-gray-200/80 hover:border-primary-300 transition-colors"
+              >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-sm font-bold text-gray-900">{p.codigo}</span>
+                  <span className="font-mono text-sm font-bold text-gray-900">
+                    {p.codigo}
+                  </span>
                   <EstadoPedidoBadge estado={p.estado} />
                 </div>
 
-                <p className="text-xs font-semibold text-gray-800">{p.cliente.nombre}</p>
+                <p className="text-xs font-semibold text-gray-800">
+                  {p.cliente.nombre}
+                </p>
                 <p className="text-xs text-gray-500 mb-3">{p.cliente.ciudad}</p>
 
                 <div className="border-t border-gray-100 pt-2 space-y-1">
-                  <p className="text-xs font-medium text-gray-700">Ítems a fabricar:</p>
+                  <p className="text-xs font-medium text-gray-700">
+                    Ítems a fabricar:
+                  </p>
                   <ul className="text-xs text-gray-600 list-disc list-inside space-y-0.5">
                     {p.items.map((it) => (
                       <li key={it.id} className="truncate">
@@ -104,7 +122,10 @@ export default async function ProduccionAdminPage() {
 
                 <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
                   <span className="text-gray-400">
-                    {new Date(p.fechaPedido).toLocaleDateString("es-CO", { day: "2-digit", month: "short" })}
+                    {new Date(p.fechaPedido).toLocaleDateString("es-CO", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
                   </span>
                   <Link
                     href={`/admin/pedidos/${p.id}`}

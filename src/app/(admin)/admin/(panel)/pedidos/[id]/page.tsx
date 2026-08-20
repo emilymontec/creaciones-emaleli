@@ -4,7 +4,7 @@ import { PedidoDetallePage } from "@/src/frontend/modules/pedidos/components/Ped
 import { Loader } from "@/src/frontend/components/ui/Loader";
 
 export const metadata: Metadata = {
-  title: "Detalle de pedido | Emaleli Admin",
+  title: "Detalle de pedido | Administración",
 };
 
 export default async function PedidoDetalleRoute({

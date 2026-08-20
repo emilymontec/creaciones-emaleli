@@ -3,7 +3,7 @@ import { ClientesPanel } from "@/src/frontend/modules/clientes/components/Client
 import { prisma } from "@/src/backend/shared/prisma";
 
 export const metadata: Metadata = {
-  title: "Directorio de Clientes | Emaleli Admin",
+  title: "Directorio de Clientes | Administración",
 };
 
 const PER_PAGE = 20;

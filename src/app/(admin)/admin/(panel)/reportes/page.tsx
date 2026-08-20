@@ -8,7 +8,7 @@ import { requireAdmin } from "@/src/backend/shared/require-admin";
 import { PERMISOS } from "@/src/shared/constants/permissions";
 
 export const metadata: Metadata = {
-  title: "Reportes y Analíticas | Emaleli Admin",
+  title: "Reportes y Analíticas | Administración",
 };
 
 export default async function ReportesAdminPage() {

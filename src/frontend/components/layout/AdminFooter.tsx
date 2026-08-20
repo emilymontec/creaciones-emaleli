@@ -7,12 +7,15 @@ export function AdminFooter() {
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} Creaciones Emaleli · Panel de
-            administración
+            Administración
           </p>
           <p>v{APP_VERSION}</p>
         </div>
       </div>
-      <div className="h-[2px] bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500" aria-hidden />
+      <div
+        className="h-[2px] bg-gradient-to-r from-accent-500 via-primary-500 to-secondary-500"
+        aria-hidden
+      />
     </footer>
   );
 }

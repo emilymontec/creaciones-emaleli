@@ -4,7 +4,7 @@ import { PageHeader } from "@/src/frontend/components/shared/PageHeader";
 import { PerfilPage } from "@/src/frontend/modules/auth/components/PerfilPage";
 
 export const metadata: Metadata = {
-  title: "Mi perfil | Emaleli Admin",
+  title: "Mi perfil | Administración",
 };
 
 export default function PerfilAdminPage() {

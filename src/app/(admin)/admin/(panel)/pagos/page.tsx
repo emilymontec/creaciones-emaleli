@@ -4,7 +4,7 @@ import { PagosPanel } from "@/src/frontend/modules/pagos/components/PagosPanel";
 import { Loader } from "@/src/frontend/components/ui/Loader";
 
 export const metadata: Metadata = {
-  title: "Gestión de Pagos y Caja | Emaleli Admin",
+  title: "Gestión de Pagos y Caja | Administración",
 };
 
 export default function PagosAdminPage() {
