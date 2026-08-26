@@ -3,7 +3,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/readme_assets/creaciones-emaleli.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/readme_assets/creaciones-emaleli.svg">
-  <img alt="CreacionesEmaleli Logo" src="docs/readme_assets/creaciones-emaleli.svg" width="300">
+  <img alt="CreacionesEmaleli" src="docs/readme_assets/creaciones-emaleli.svg" width="300">
 </picture>
 
 <p align="center">
