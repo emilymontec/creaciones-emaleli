@@ -17,6 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "storage:setup": "tsx scripts/setup-storage.ts",
+    "db:keep-alive": "node scripts/keep-alive.mjs",
+    "db:keep-alive:daemon": "node scripts/keep-alive.mjs --loop",
     "prepare": "husky"
   },
   "lint-staged": {
