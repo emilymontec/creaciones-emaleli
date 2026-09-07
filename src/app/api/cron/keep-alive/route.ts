@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/backend/shared/prisma";
+import { prisma } from "@/src/backend/shared/prisma";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 15;
